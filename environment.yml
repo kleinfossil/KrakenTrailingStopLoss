@@ -1,0 +1,10 @@
+name: python310_stoploss
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10.4=hbb2ffb3_0
+  - anaconda
+  - pip
+  - pip:
+    - -r requirements.txt
