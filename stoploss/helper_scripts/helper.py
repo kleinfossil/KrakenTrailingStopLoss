@@ -28,6 +28,7 @@ def get_stdev(data):
 
 # Creates a colorful logger
 def get_logger(name="log"):
+
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
@@ -35,5 +36,6 @@ def get_logger(name="log"):
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     ch.setFormatter(CustomFormatter())
-    logger.addHandler(ch)
+    if not logger.handlers:
+        logger.addHandler(ch)
     return logger

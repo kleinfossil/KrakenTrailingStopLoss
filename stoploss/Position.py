@@ -19,7 +19,7 @@ class Position:
                                                 # Used for easier interaction with the exchange platform
     current_volume_of_base_currency: Decimal      # Current volume of base currency. e.g. 100
     current_volume_of_quote_currency: Decimal     # Current volume of quote currency. e.g. 0.01
-    trigger: Decimal                            # Trigger for stop loss
+    trigger: Decimal = 0                          # Trigger for stop loss
 
     last_decision_price = None
 
