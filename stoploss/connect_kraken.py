@@ -2,17 +2,19 @@
 
 import logging
 import urllib.request
+import requests
 import time
 import json
 logger = logging.getLogger(__name__)
+
+api_domain = "https://api.kraken.com"
+api_path = "/0/public/"
+api_data = ""
 
 
 # Provides Open, High, Low, Close Data. See: https://docs.kraken.com/rest/#operation/getOHLCData
 def get_ohlc_json(pair, interval=1, since=0):
 
-    api_domain = "https://api.kraken.com"
-    api_path = "/0/public/"
-    api_data = ""
     endpoint_path = "?pair=%(pair)s&interval=%(interval)s"
     api_symbol = pair.upper()
 
@@ -40,7 +42,13 @@ def get_ohlc_json(pair, interval=1, since=0):
             time.sleep(3)
         else:
             logger.info("Kraken Request Executed and JSON Data provided")
-
+        return api_data
     except KeyboardInterrupt:
         print("Keyboard Interrupt")
-    return api_data
+
+
+
+def get_ticker(pair):
+    api_symbol = pair.upper()
+    value = requests.get(f'https://api.kraken.com/0/public/Ticker?pair={api_symbol}').json()
+    return value

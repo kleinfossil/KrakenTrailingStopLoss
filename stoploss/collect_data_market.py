@@ -4,10 +4,16 @@ import traceback
 import logging
 import pandas as pd
 
-from stoploss.connect_kraken import get_ohlc_json
-from stoploss.helper_scripts.helper import convert_unix_time_of_dateframe
-from stoploss.helper_scripts.helper import get_stdev
-from stoploss.helper_scripts.helper import get_logger
+from stoploss.connect_kraken import (
+    get_ohlc_json,
+    get_ticker
+)
+
+from stoploss.helper_scripts.helper import (
+    convert_unix_time_of_dateframe,
+    get_stdev,
+    get_logger
+)
 
 logger = get_logger("stoploss")
 
@@ -71,3 +77,9 @@ def get_ohlc_min(df, history_length):
 
 def get_ohlc_standard_deviation(df, history_length):
     return get_stdev(df["Close"].tail(history_length))
+
+
+def get_last_trade_price(pair):
+    resp = get_ticker(pair)
+    value = resp["result"][pair]["c"][0]
+    return value

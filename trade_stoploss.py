@@ -2,8 +2,11 @@ import argparse
 from decimal import Decimal
 
 from stoploss.helper_scripts.helper import get_logger
-from stoploss.collect_data_market import get_ohlc_dataframe
-from stoploss.collect_data_market import get_indicator_form_ohlc
+from stoploss.collect_data_market import (
+    get_ohlc_dataframe,
+    get_indicator_form_ohlc,
+    get_last_trade_price
+)
 from stoploss.collect_data_user import fake_get_account_balance_per_currency
 from stoploss.Position import Position
 
@@ -49,7 +52,6 @@ def test_functions(std_history, minmax_history):
 
 
 def create_position(base_currency, quote_currency):
-
     if (base_currency == "ETH") and (quote_currency == "EUR"):
         exchange_currency_pair = "XETHZEUR"
     else:
@@ -67,12 +69,20 @@ def create_position(base_currency, quote_currency):
     return new_position
 
 
+def set_sell_trigger(position):
+    print(f"last price: {get_last_trade_price(position.exchange_currency_pair)}")
+    return position
+
+
+def calculate_trigger(position):
+    if position.current_volume_of_quote_currency > 0:
+        position = set_sell_trigger(position)
+    return position
+
+
 if __name__ == "__main__":
     trade_arguments = get_arguments()
     # test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
     my_position = create_position(base_currency="ETH", quote_currency="EUR")
     print(my_position)
-
-
-
-
+    calculate_trigger(position=my_position)
