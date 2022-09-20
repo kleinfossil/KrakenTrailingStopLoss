@@ -82,7 +82,7 @@ def calculate_trigger(position):
 
 if __name__ == "__main__":
     trade_arguments = get_arguments()
-    # test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
+    test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
     my_position = create_position(base_currency="ETH", quote_currency="EUR")
     print(my_position)
     calculate_trigger(position=my_position)

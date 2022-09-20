@@ -9,7 +9,7 @@ logger = get_logger("main_logger")
 
 if __name__ == "__main__":
     # simple_test()
-    call(["python", "trade_stoploss.py", "--std_history", "15", "--minmax_history", "24"])
+    call(["python", "trade_stoploss.py", "--std_history", "10", "--minmax_history", "24"])
 
     logger.info("Program Executed")
 

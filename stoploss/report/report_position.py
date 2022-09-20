@@ -46,6 +46,7 @@ def append_to_book(name, book, book_entries):
 
     book.to_csv(f"{cfg['basic']['book-storage-location']}{name}_book.csv", index=False)
     book.to_excel((f"{cfg['basic']['book-storage-location']}{name}_book.xlsx"))
+    logger.info(f"Book saved at: {cfg['basic']['book-storage-location']}{name}_book.csv/xlsx")
     return book
 
 
@@ -66,8 +67,8 @@ def init_book(name):
 def open_book(name):
     # Create Book
     try:
-        print(cfg['basic']['book-storage-location'])
         db_path = cfg['basic']['book-storage-location'] + name + "_book.csv"
+        logger.info(f"Opening book at {db_path}")
         book = pd.read_csv(db_path)
     except pd.errors.EmptyDataError:
         logger.warning(f"{name} Book csv was empty. This is normal if the program runs for the first time. "
@@ -78,5 +79,5 @@ def open_book(name):
                        f"The {name} book will be initialised now.")
         book = init_book(name)
     else:
-        logger.info(f"{name} Book loaded.")
+        logger.info(f"{name} book loaded into memory")
     return book
