@@ -46,9 +46,9 @@ def test_functions(std_history, minmax_history):
 
 
 if __name__ == "__main__":
-    # collect all arguments
     trade_arguments = get_arguments()
-    test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
+    # test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
+
 
 
 
