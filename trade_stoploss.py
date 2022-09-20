@@ -1,7 +1,9 @@
 import argparse
 from decimal import Decimal
 
-from stoploss.helper_scripts.helper import get_logger
+from stoploss.helper_scripts.helper import (
+    get_logger,
+    set_log_level)
 from stoploss.collect_data_market import (
     get_ohlc_dataframe,
     get_indicator_form_ohlc,
@@ -29,6 +31,13 @@ def get_arguments():
         nargs="?",
         default=24,
         help="Number values which should be used to identify minimum and maximum"
+    )
+    parser.add_argument(
+        "--log_level",
+        type=str,
+        nargs="?",
+        default="DEBUG",
+        help="Log level. See: https://docs.python.org/3/library/logging.html#levels"
     )
 
     opt = parser.parse_args()
@@ -82,6 +91,7 @@ def calculate_trigger(position):
 
 if __name__ == "__main__":
     trade_arguments = get_arguments()
+    set_log_level(logger, trade_arguments.log_level)
     test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
     my_position = create_position(base_currency="ETH", quote_currency="EUR")
     print(my_position)

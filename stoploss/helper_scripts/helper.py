@@ -27,15 +27,33 @@ def get_stdev(data):
 
 
 # Creates a colorful logger
-def get_logger(name="log"):
+def get_logger(name="log", log_level="DEBUG"):
 
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    set_log_level(logger, log_level)
+    set_log_level(ch, log_level)
+
     ch.setFormatter(CustomFormatter())
     if not logger.handlers:
         logger.addHandler(ch)
+    return logger
+
+
+def set_log_level(logger, log_level):
+    match log_level.upper():
+        case "NOTSET":
+            logger.setLevel(logging.NOTSET)
+        case "DEBUG":
+            logger.setLevel(logging.DEBUG)
+        case "INFO":
+            logger.setLevel(logging.INFO)
+        case "WARNING":
+            logger.setLevel(logging.WARNING)
+        case "ERROR":
+            logger.setLevel(logging.ERROR)
+        case "CRITICAL":
+            logger.setLevel(logging.CRITICAL)
     return logger

@@ -15,7 +15,7 @@ from stoploss.helper_scripts.helper import (
     get_logger
 )
 
-logger = get_logger("stoploss")
+logger = get_logger("stoploss_logger")
 
 
 # Collect ohlc data and return a dataframe from a json

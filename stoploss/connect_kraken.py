@@ -1,11 +1,14 @@
 # Script functions who connect to kraken
 
-import logging
 import urllib.request
 import requests
 import time
 import json
-logger = logging.getLogger(__name__)
+from stoploss.helper_scripts.helper import (
+    get_logger)
+
+logger = get_logger("stoploss_logger")
+
 
 api_domain = "https://api.kraken.com"
 api_path = "/0/public/"
