@@ -6,11 +6,10 @@ from stoploss.helper_scripts.helper import (
     set_log_level)
 from stoploss.collect_data_market import (
     get_ohlc_dataframe,
-    get_indicator_form_ohlc,
-    get_last_trade_price
+    get_indicator_form_ohlc
 )
 from stoploss.collect_data_user import fake_get_account_balance_per_currency
-from stoploss.Position import Position
+from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import set_sell_trigger
 
 logger = get_logger("stoploss_logger")
