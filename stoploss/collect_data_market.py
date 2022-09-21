@@ -10,7 +10,7 @@ from stoploss.connect_kraken import (
 )
 
 from stoploss.helper_scripts.helper import (
-    convert_unix_time_of_dateframe,
+    convert_unix_time_to_datetime,
     get_stdev,
     get_logger
 )
@@ -22,7 +22,7 @@ logger = get_logger("stoploss_logger")
 def get_ohlc_dataframe(pair, interval):
     ohlc_json_output = get_ohlc_json(pair=pair, interval=interval)
     ohlc_df = transform_ohlc_json_to_ohlc_dataframe(ohlc_json_output, pair)
-    ohlc_df["Date"] = ohlc_df["Date"].apply(convert_unix_time_of_dateframe)
+    ohlc_df["Date"] = ohlc_df["Date"].apply(convert_unix_time_to_datetime)
     return ohlc_df
 
 

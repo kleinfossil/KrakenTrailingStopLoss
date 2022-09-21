@@ -3,14 +3,18 @@ from decimal import Decimal
 
 from stoploss.helper_scripts.helper import (
     get_logger,
-    set_log_level)
+    set_log_level,
+    convert_datetime_to_unix_time)
 from stoploss.collect_data_market import (
     get_ohlc_dataframe,
     get_indicator_form_ohlc
 )
 from stoploss.collect_data_user import fake_get_account_balance_per_currency
 from stoploss.data_classes.Position import Position
-from stoploss.strategy_stop_loss import set_sell_trigger
+from stoploss.strategy_stop_loss import (
+    initiate_stop_loss_trigger,
+    update_stop_loss_trigger)
+import time
 
 logger = get_logger("stoploss_logger")
 
@@ -38,6 +42,20 @@ def get_arguments():
         nargs="?",
         default="DEBUG",
         help="Log level. See: https://docs.python.org/3/library/logging.html#levels"
+    )
+    parser.add_argument(
+        "--trading_time",
+        type=str,
+        nargs="?",
+        default="2023-12-31T00:00:00+00:00",
+        help="RFC 3339 time stamp until which the trader should trade, e.g.: 2022-09-21T10:49:53+00:00. See: https://tools.ietf.org/html/rfc3339"
+    )
+    parser.add_argument(
+        "--stop_loss_interval",
+        type=int,
+        nargs="?",
+        default=1000,
+        help="Time in Milliseconds how often the trader should check for a stop loss trigger move"
     )
 
     opt = parser.parse_args()
@@ -78,16 +96,21 @@ def create_position(base_currency, quote_currency):
     return new_position
 
 
-def calculate_trigger(position):
-    if position.current_volume_of_quote_currency > 0:
-        position = set_sell_trigger(position)
-    return position
-
-
 if __name__ == "__main__":
+
     trade_arguments = get_arguments()
     set_log_level(logger, trade_arguments.log_level)
     test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
     my_position = create_position(base_currency="ETH", quote_currency="EUR")
     print(my_position)
-    calculate_trigger(position=my_position)
+    stop_loss_position = initiate_stop_loss_trigger(position=my_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
+    time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
+
+    logger.info(f" Trader Will start a finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
+    while time_till_finish <= time.time():
+        # trade position
+        # update trigger with stop_loss_interval
+        stop_loss_position = update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
+        print(f" Current StopLoss Position: {stop_loss_position}")
+
+

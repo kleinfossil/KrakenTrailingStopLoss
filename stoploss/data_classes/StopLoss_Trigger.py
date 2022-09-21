@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import pandas as pd
 from decimal import Decimal
+import time
 from time import time
 
 from stoploss.collect_data_market import (get_ohlc_dataframe,
@@ -16,7 +17,7 @@ logger = get_logger("stoploss_logger")
 
 
 @dataclass
-class Trigger:
+class StopLoss_Trigger:
     df_ohlc_minmax: pd.DataFrame()
     df_ohlc_std: pd.DataFrame()
     position: Position
@@ -24,6 +25,7 @@ class Trigger:
     last_low: Decimal = 0
     last_high: Decimal = 0
     last_std: Decimal = 0
+    last_execution_time = 0
 
     def __init__(self, position, std_interval, std_history, minmax_interval, minmax_history):
         self.position = position
@@ -31,6 +33,9 @@ class Trigger:
 
     def get_position(self):
         return self.position
+
+    def get_last_execution_time(self):
+        return self.last_execution_time
 
     def update_ohlc_minmax(self, minmax_interval):
         self.df_ohlc_minmax = get_ohlc_dataframe(pair=self.position.base_currency, interval=minmax_interval)
@@ -40,6 +45,9 @@ class Trigger:
 
     def update_position(self, new_position):
         self.position = new_position
+
+    def set_execution_time(self):
+        self.last_execution_time = time.time()
 
     def set_trigger(self, std, high, low, last_trade_price):
         self.last_std = std
@@ -99,5 +107,6 @@ class Trigger:
             self.set_moving_trigger(std, high, low, last_trade_price)
 
         logger.info(f"'New Trigger: {self.position.trigger} {self.position.quote_currency}")
+        self.set_execution_time()
 
         return self.position

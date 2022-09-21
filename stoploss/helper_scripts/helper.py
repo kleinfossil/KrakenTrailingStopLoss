@@ -1,15 +1,21 @@
 # Script functions which are generic and not specific to this project
 import math
 import datetime
+import time
 import logging
 
 from stoploss.helper_scripts.formated_logger import CustomFormatter
 
 
 # Take a unix time stamp and return a data and time format
-def convert_unix_time_of_dateframe(unix_time):
+def convert_unix_time_to_datetime(unix_time):
     date_and_time = datetime.datetime.fromtimestamp(unix_time)
     return str(date_and_time)
+
+
+def convert_datetime_to_unix_time(date_time):
+    unix_time = time.mktime(date_time.timetuple())
+    return unix_time
 
 
 # Calculate variance based on a list of data
