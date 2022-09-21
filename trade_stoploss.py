@@ -11,6 +11,7 @@ from stoploss.collect_data_market import (
 )
 from stoploss.collect_data_user import fake_get_account_balance_per_currency
 from stoploss.Position import Position
+from stoploss.strategy_stop_loss import set_sell_trigger
 
 logger = get_logger("stoploss_logger")
 
@@ -76,11 +77,6 @@ def create_position(base_currency, quote_currency):
                             current_volume_of_quote_currency=current_volume_of_quote_currency,
                             )
     return new_position
-
-
-def set_sell_trigger(position):
-    print(f"last price: {get_last_trade_price(position.exchange_currency_pair)}")
-    return position
 
 
 def calculate_trigger(position):
