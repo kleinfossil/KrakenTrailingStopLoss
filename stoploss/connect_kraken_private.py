@@ -129,3 +129,16 @@ def query_order_info(txid, key_type):
         logger.warning(f"Fake Query Values: {fake_response}")
         resp = fake_response
         return resp
+
+
+def trade_add_order(trade_dict, key_type):
+    endpoint = "AddOrder"
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    kill_switch = cfg["debugging"]["kraken"]["kill_switch"]
+    if kill_switch == "do_not_trade":
+        logger.warning(f"Kill switch is {kill_switch}. No trades will be made")
+    elif kill_switch == "trade":
+        logger.debug(f"Make request to kraken with following Data: {trade_dict}")
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
+    trade_execution_check = True
+    return resp.json(), trade_execution_check

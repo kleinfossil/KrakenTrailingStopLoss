@@ -1,5 +1,5 @@
 from stoploss.helper_scripts.helper import get_logger
-from stoploss.connect_kraken_private import get_secrets
+from stoploss.connect_kraken_private import get_secrets, trade_add_order
 from stoploss.checks_kraken import check_order
 from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
@@ -31,25 +31,17 @@ def execute_order(trade_variable):
         if make_trade == 1:
             if use_real_data == 1:
                 if check_order(trade_variable):
-                    api_key, api_sec = get_secrets(key_type="trade", version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
-                    logger.info(f"Executing Order on Kraken. Call: {api_url},{data} "
-                                f"Notice: Api key and secret not shown in log")
-                    # resp = kraken_request(api_url, '/0/private/AddOrder', data, api_key, api_sec)
-                    trade_execution_check = True
+                    resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
                 else:
                     logger.exception("Not enough Funds available. Trade not executed")
                     trade_execution_check = False
                     resp = ""
             elif use_real_data == 0:
-                api_key, api_sec = get_secrets(key_type="trade", version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
                 logger.warning("Make a Example Trade! Change main_config 'UseRealData' to 1 for real data")
                 logger.warning("Overwriting trade_variables with example data")
                 trade_variable.set_example_values()
                 if check_order(trade_variable):
-                    logger.warning(f"Executing Order on Kraken with example Data. Call: {api_url},{data} "
-                                   f"Notice: Api key and secret not shown in log")
-                    # resp = kraken_request(api_url, '/0/private/AddOrder', data, api_key, api_sec)
-                    trade_execution_check = True
+                    resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
                 else:
                     logger.exception("Not enough Funds available. Trade not executed")
                     trade_execution_check = False

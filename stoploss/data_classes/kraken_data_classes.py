@@ -47,7 +47,8 @@ class AddTrade:
         self.type = "buy"
         self.volume = "0.001"
         self.pair = "XETHZEUR"
-        self.price = "2000"
+        self.price = "10"
+        self.price2 = "11"
         self.timeinforce = timeinforce
         self.expiretm = expiretm
         self.validate = "true"
