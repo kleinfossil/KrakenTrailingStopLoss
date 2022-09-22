@@ -1,24 +1,16 @@
 import traceback
-
 import argparse
+import time
 from decimal import Decimal
-
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
-    convert_datetime_to_unix_time,
-    convert_unix_time_to_datetime)
-from stoploss.collect_data_market import (
-    get_ohlc_dataframe,
-    get_indicator_form_ohlc
-)
+    convert_datetime_to_unix_time)
 from stoploss.collect_data_user import get_account_balance_per_currency
 from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger)
-import time
-
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 import yaml
 from yaml.loader import SafeLoader
@@ -96,16 +88,36 @@ def create_position(base_currency, quote_currency):
     except RuntimeError as e:
         logger.error(traceback.print_stack(),e)
 
+
+def init_program():
+    # Resolve provided arguments
+    arguments = get_arguments()
+    # set log level based on arguments
+    set_log_level(logger, arguments.log_level)
+    return arguments
+
+
+def init_trader():
+    # create position
+    position = create_position(base_currency=cfg["trading"]["position"]["base_currency"], quote_currency=cfg["trading"]["position"]["quote_currency"])
+    return position
+
+
+
 if __name__ == "__main__":
+    # Start program
+    trade_arguments = init_program()
+    logger.info("Program ready to trade")
+    my_position = init_trader()
 
-    trade_arguments = get_arguments()
-    set_log_level(logger, trade_arguments.log_level)
-    my_position = create_position(base_currency=cfg["trading"]["position"]["base_currency"], quote_currency=cfg["trading"]["position"]["quote_currency"])
-    print(my_position)
+    # initiate stop loss trigger
     stop_loss_position = initiate_stop_loss_trigger(position=my_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
-    time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
 
+    # lock finish time
+    time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
     logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
+
+    # Start trading
     while time_till_finish >= time.time():
         # trade position
         # update trigger with stop_loss_interval
