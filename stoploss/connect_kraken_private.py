@@ -2,7 +2,7 @@ import traceback
 
 from stoploss.helper_scripts.helper import get_logger
 from stoploss.helper_scripts.google_secretmanager import access_secret_version
-import os
+from test.fake_data.fake_data_user import fake_response_query_data
 import urllib.parse
 import hashlib
 import hmac
@@ -44,7 +44,7 @@ def get_secrets(key_type, version):
         elif google_secrets == 0:
             logger.warning("Get Query API Keys from local yaml file. This is for development only. Use Google Secrets for production runs. "
                            "Change trader_config to google-secrets=1")
-            local_yaml_key_location = cfg["kraken_private"]["development_keys"]["key_ylocation"]
+            local_yaml_key_location = cfg["kraken_private"]["development_keys"]["key_location"]
             with open(local_yaml_key_location, "r") as key_yml:
                 key_cfg = yaml.load(key_yml, Loader=SafeLoader)
             kraken_api_key = key_cfg["kraken-key"][key][version]["key"]
@@ -108,23 +108,24 @@ def get_open_orders(key_type):
     return resp.json()
 
 
+# Retrieve information about specific orders.
 def query_order_info(txid, key_type):
-    # Retrieve information about specific orders.
-
+    endpoint = "QueryOrders"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
-    make_query = int(config["TRADE"]["MakeRealQuery"])
-    api_url = "https://api.kraken.com"
+
+    make_query = int(cfg["debugging"]["kraken"]["make_real_query"])
 
     if make_query == 1:
-        resp = kraken_request(api_url,'/0/private/QueryOrders', {
+        resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
             "nonce": str(int(1000 * time.time())),
             "txid": txid,                        # Comma delimited list of transaction IDs to query info about (20 maximum)
             "trades": True
         }, api_key, api_sec)
+        return resp.json()
     else:
         logger.warning(f"Make a Fake Trade Query! Change main_config 'MakeRealQuery' to 1 for real queries. "
                        f"Notice: Api key and secret not shown in log ")
         fake_response = fake_response_query_data(txid)
         logger.warning(f"Fake Query Values: {fake_response}")
         resp = fake_response
-    return resp
+        return resp
