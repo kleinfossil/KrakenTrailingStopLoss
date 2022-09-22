@@ -3,8 +3,13 @@
 
 from subprocess import call
 from stoploss.helper_scripts.helper import get_logger
+import yaml
+from yaml.loader import SafeLoader
 
-log_level = "INFO"
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
+
+log_level = cfg["debugging"]["log-level"]
 
 logger = get_logger("main_logger", log_level)
 

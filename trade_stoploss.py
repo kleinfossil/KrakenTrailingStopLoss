@@ -1,3 +1,5 @@
+import traceback
+
 import argparse
 from decimal import Decimal
 
@@ -18,6 +20,11 @@ from stoploss.strategy_stop_loss import (
 import time
 
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 logger = get_logger("stoploss_logger")
 
@@ -65,48 +72,35 @@ def get_arguments():
     return opt
 
 
-# Just to test some functions
-def test_functions(std_history, minmax_history):
-    print("Start auto Trader")
-    hourly_ohlc = get_ohlc_dataframe(pair="XETHZEUR", interval=60)
-    daily_ohlc = get_ohlc_dataframe(pair="XETHZEUR", interval=1440)
-
-    price_24h_min = get_indicator_form_ohlc(df=hourly_ohlc, indicator="min", history_length=minmax_history)
-    price_24h_max = get_indicator_form_ohlc(df=hourly_ohlc, indicator="max", history_length=minmax_history)
-
-    stdev_days = get_indicator_form_ohlc(df=daily_ohlc, indicator="std", history_length=std_history)
-
-    print(f"Max: {price_24h_max}")
-    print(f"Min: {price_24h_min}")
-    print(f"Stdev Last {std_history} Days: {stdev_days}")
-
-
 def create_position(base_currency, quote_currency):
-    if (base_currency == "ETH") and (quote_currency == "EUR"):
-        exchange_currency_pair = "XETHZEUR"
-    else:
-        raise RuntimeError(f"{base_currency=} and {quote_currency=} are not a supported exchange currency pair.")
-    currencies = [base_currency, quote_currency]
-    balances = fake_get_account_balance_per_currency(currencies)
-    deci_balances = {}
-    for currency in currencies:
-        deci_balances[currency] = Decimal(balances[currency].replace(',', '.'))
+    try:
+        if (base_currency == "XETH") and (quote_currency == "ZEUR"):
+            exchange_currency_pair = "XETHZEUR"
+        else:
+            raise RuntimeError(f"{base_currency=} and {quote_currency=} are not a supported exchange currency pair.")
+        if cfg["debugging"]["use-fake-user-balance"] == 1:
+            currencies = [base_currency, quote_currency]
+            balances = fake_get_account_balance_per_currency(currencies)
+        elif cfg["debugging"]["use-fake-user-balance"] == 0:
+            balances = get_account_balance_per_currency(exchange_currency_pair)
+        else:
+            raise RuntimeError(f'{cfg["debugging"]["use-fake-user-balance"]} is not valid for use-fake-user-balance in trader_config.yml')
 
-    new_position = Position(base_currency=base_currency,
-                            quote_currency=quote_currency,
-                            exchange_currency_pair=exchange_currency_pair,
-                            current_volume_of_base_currency=deci_balances[base_currency],
-                            current_volume_of_quote_currency=deci_balances[quote_currency],
-                            )
-    return new_position
-
+        new_position = Position(base_currency=base_currency,
+                                quote_currency=quote_currency,
+                                exchange_currency_pair=exchange_currency_pair,
+                                current_volume_of_base_currency=Decimal(balances[base_currency].replace(',', '.')),
+                                current_volume_of_quote_currency=Decimal(balances[quote_currency].replace(',', '.')),
+                                )
+        return new_position
+    except RuntimeError as e:
+        logger.error(traceback.print_stack(),e)
 
 if __name__ == "__main__":
 
     trade_arguments = get_arguments()
     set_log_level(logger, trade_arguments.log_level)
-    # test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
-    my_position = create_position(base_currency="ETH", quote_currency="EUR")
+    my_position = create_position(base_currency="XETH", quote_currency="ZEUR")
     print(my_position)
     stop_loss_position = initiate_stop_loss_trigger(position=my_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
     time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)

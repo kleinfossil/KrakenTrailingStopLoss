@@ -69,3 +69,16 @@ def get_ticker(pair):
     json_response = make_public_data_request(api_request=api_request).json()
     if check_response_for_errors(json_response=json_response, api_request=api_request):
         return json_response
+
+
+def get_asset_pairs(pair):
+    api_symbol = pair.upper()
+    endpoint = "AssetPairs"
+
+    endpoint_attribute_structure = "?pair=%(pair)s"
+    endpoint_attributes = endpoint_attribute_structure % {"pair": api_symbol}
+
+    api_request = api_domain + api_path + endpoint + endpoint_attributes
+    json_response = make_public_data_request(api_request=api_request).json()
+    if check_response_for_errors(json_response=json_response, api_request=api_request):
+        return json_response

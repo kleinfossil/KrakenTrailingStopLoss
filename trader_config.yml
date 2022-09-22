@@ -1,5 +1,10 @@
 basic:
   book-storage-location: D:\07_DevelopmentProjects\01_Kraken\TradingBooks\
+debugging:
+  log-level: "DEBUG"
+  use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values
 kraken_private:
   google:
     google-secrets: 0 # 1 will use secrets stored in google cloud while 0 will use secrets from the environment variable
+  development-keys:
+    key-location: "D:/07_DevelopmentProjects/01_Kraken/api_keys/api_key_development.yml" # This is only used for development purposes.
