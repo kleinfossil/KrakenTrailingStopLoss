@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     trade_arguments = get_arguments()
     set_log_level(logger, trade_arguments.log_level)
-    my_position = create_position(base_currency="XETH", quote_currency="ZEUR")
+    my_position = create_position(base_currency=cfg["trading"]["position"]["base_currency"], quote_currency=cfg["trading"]["position"]["quote_currency"])
     print(my_position)
     stop_loss_position = initiate_stop_loss_trigger(position=my_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
     time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)

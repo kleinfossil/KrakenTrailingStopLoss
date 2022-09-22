@@ -1,5 +1,9 @@
 basic:
   book-storage-location: D:\07_DevelopmentProjects\01_Kraken\TradingBooks\
+trading:
+  position:
+    base_currency: "XETH"
+    quote_currency: "ZEUR"
 debugging:
   log-level: "DEBUG"
   use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values
