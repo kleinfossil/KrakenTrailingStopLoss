@@ -20,9 +20,22 @@ api_domain = "https://api.kraken.com"
 api_path = "/0/private/"
 
 
-def get_secrets_query_on_google():
+def get_secrets(key_type, version):
     # Read Kraken API key and secret for query stored in Google or environment variable (for testing)
+
     try:
+        match key_type:
+            case "query":
+                key = "query-key"
+            case "create":
+                key = "create-cancel"
+            case "cancel":
+                key = "create-cancel"
+            case "modify":
+                key = "modify"
+            case _:
+                raise RuntimeError(f"'{key_type}' is not a known key")
+
         google_secrets = int(cfg["kraken_private"]["google"]["google-secrets"])
         if google_secrets == 1:
             logger.debug("Get Query API Keys from Google")
@@ -34,8 +47,8 @@ def get_secrets_query_on_google():
             local_yaml_key_location = cfg["kraken_private"]["development-keys"]["key-location"]
             with open(local_yaml_key_location, "r") as key_yml:
                 key_cfg = yaml.load(key_yml, Loader=SafeLoader)
-            kraken_api_key = key_cfg["kraken-key"]["query-key"][220922]["key"]
-            kraken_private_key = key_cfg["kraken-key"]["query-key"][220922]["sec"]
+            kraken_api_key = key_cfg["kraken-key"][key][version]["key"]
+            kraken_private_key = key_cfg["kraken-key"][key][version]["sec"]
         else:
             logger.error("Google Secrets are not configured correctly. Use either 1 for google secrets or 0 for local secrets")
             raise RuntimeError("Google Secrets are not configured correctly. Use either 1 for google secrets or 0 for local secrets")
@@ -72,11 +85,24 @@ def kraken_request(api_url, uri_path, data, api_key, api_sec):
 
 
 # Get the current account balance
-def get_account_balance():
+def get_account_balance(key_type):
     endpoint = "Balance"
-    api_key, api_sec = get_secrets_query_on_google()  # Read Kraken API key and secret stored in environment variables
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
     resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
         "nonce": str(int(1000 * time.time()))
     }, api_key, api_sec)
+    return resp.json()
+
+
+# Get open Orders
+def get_open_orders(key_type):
+    endpoint = "OpenOrders"
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    # Construct the request and return the result
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+        "nonce": str(int(1000 * time.time())),
+        "trades": True
+    }, api_key, api_sec)
+    logger.info(f"Open Orders received from Kraken. Orders: {str(resp.json())}")
     return resp.json()

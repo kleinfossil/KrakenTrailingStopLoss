@@ -1,14 +1,39 @@
 basic:
   book-storage-location: D:\07_DevelopmentProjects\01_Kraken\TradingBooks\
+
 trading:
+  supported_currencies: XETHZEUR
   position:
     base_currency: "XETH"
     quote_currency: "ZEUR"
+  strategy: # 1 if this strategy is active. 0 if the strategy is inactive
+    stop_loss:
+      active: 1
+      buy_price_offset: 1
+      sell_price_offset: 1
+      quote_currency_offset: 30
+
 debugging:
   log-level: "DEBUG"
-  use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values
+  use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values.
+  kraken:
+    make_trade: 0 # 1 will make a real trade, while 0 will use fake trade data.
+    use_real_trading_data: 1 # 1 will use data as provided to the trade. 0 will overwrite this data with predefined fake data.
+
 kraken_private:
   google:
     google-secrets: 0 # 1 will use secrets stored in google cloud while 0 will use secrets from the environment variable
   development-keys:
     key-location: "D:/07_DevelopmentProjects/01_Kraken/api_keys/api_key_development.yml" # This is only used for development purposes.
+    key_version: 220922
+
+kraken_trade:
+  trade_requires_approval: 1 # 1 will have the trader wait for approval. 0 will not require a approval
+  order_type: stop-loss-limit
+  allowed_decimals:
+    XETHZEUR:
+      price_decimals: 2
+      volume_decimals: 8
+  minimum_order:
+    XETHZEUR: 0.001
+      

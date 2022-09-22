@@ -10,8 +10,11 @@ from stoploss.collect_data_user import get_account_balance_per_currency
 from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
-    update_stop_loss_trigger)
+    update_stop_loss_trigger,
+    get_buy_or_sell_type,
+    get_limit_price_and_volume)
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
+from stoploss.trading import add_order
 import yaml
 from yaml.loader import SafeLoader
 
@@ -103,6 +106,19 @@ def init_trader():
     return position
 
 
+def trade_position(position):
+    try:
+        if cfg["trading"]["strategy"]["stop_loss"]["active"] == 1:
+            buy_sell = get_buy_or_sell_type(position)
+            trade_dict = get_limit_price_and_volume(position=position, buy_sell_type=buy_sell)
+            add_order(position=position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
+                      price=trade_dict["price"], price2=position.trigger,
+                      trade_reason_message="Stop Loss Strategy")
+        else:
+            raise RuntimeError("No valid trading strategy found")
+    except RuntimeError as e:
+        logger.error(traceback.print_stack(), e)
+
 
 if __name__ == "__main__":
     # Start program
@@ -119,7 +135,7 @@ if __name__ == "__main__":
 
     # Start trading
     while time_till_finish >= time.time():
-        # trade position
+        trade_position(my_position)
         # update trigger with stop_loss_interval
         update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
         # trade stop loss position
