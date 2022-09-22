@@ -57,7 +57,7 @@ class StopLoss_Trigger:
 
         # Sell Position
         if self.position.current_volume_of_base_currency > 0:
-            logger.info(f"Calculate Sell Trigger because {self.position.current_volume_of_base_currency} {self.position.base_currency} is not 0")
+            logger.debug(f"Calculate Sell Trigger because {self.position.current_volume_of_base_currency} {self.position.base_currency} is not 0")
             # Set trigger below the current high to execute a sell as soon as the price falls
             self.position.trigger = self.last_high - self.last_std
             if self.position.trigger > self.last_trade_price:
@@ -66,7 +66,7 @@ class StopLoss_Trigger:
 
         # Buy Position
         else:
-            logger.info(f"Calculate Buy Trigger because {self.position.current_volume_of_base_currency} {self.position.base_currency} is equal 0")
+            logger.debug(f"Calculate Buy Trigger because {self.position.current_volume_of_base_currency} {self.position.base_currency} is equal 0")
             # Set trigger above the current low to execute a buy as soon as the price falls
             self.position.trigger = self.last_low + self.last_std
             if self.position.trigger < self.last_trade_price:
@@ -100,21 +100,17 @@ class StopLoss_Trigger:
         low = get_indicator_form_ohlc(df=self.df_ohlc_minmax, indicator="min", history_length=minmax_history)
         last_trade_price = get_last_trade_price(self.position.exchange_currency_pair)
 
-        logger.info(f"\n"
-                    f"Current Standard Deviation: {std}\n"
-                    f"Current High Price: {high} {self.position.quote_currency}\n"
-                    f"Current Low Price: {low} {self.position.quote_currency}\n"
-                    f"Last Trade Price: {last_trade_price}\n"
-                    f"")
-
-        logger.info(f"Current Trigger: {self.position.trigger} {self.position.quote_currency}")
+        print(f"\n"
+              f"Standard Deviation: {std} / High Price: {high} {self.position.quote_currency} / Low Price: {low} {self.position.quote_currency} / Last Trade Price: {last_trade_price}\n"
+              f"Current Trigger: {self.position.trigger} {self.position.quote_currency}")
 
         if self.position.trigger == 0:
             self.set_trigger(std, high, low, last_trade_price)
         else:
             self.set_moving_trigger(std, high, low, last_trade_price)
 
-        logger.info(f"New Trigger: {self.position.trigger} {self.position.quote_currency}")
+        print(f"New Trigger: {self.position.trigger} {self.position.quote_currency} \n")
+
         self.set_execution_time()
 
         return self.position

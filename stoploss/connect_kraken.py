@@ -37,7 +37,7 @@ def check_response_for_errors(json_response, api_request):
             raise RuntimeError(f"Api Request could be excuted {api_request}, but had an Error: {json_response['error']}\n"
                                f"Full Response: {json_response}")
         else:
-            logger.info("Kraken Request Executed and JSON Data provided")
+            logger.debug("Kraken Request Executed and JSON Data provided")
             return True
     except RuntimeError as e:
         logger.error(f"{traceback.print_stack()} {e}")

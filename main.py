@@ -4,7 +4,7 @@
 from subprocess import call
 from stoploss.helper_scripts.helper import get_logger
 
-log_level = "DEBUG"
+log_level = "INFO"
 
 logger = get_logger("main_logger", log_level)
 

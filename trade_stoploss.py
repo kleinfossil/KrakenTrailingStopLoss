@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     trade_arguments = get_arguments()
     set_log_level(logger, trade_arguments.log_level)
-    test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
+    # test_functions(std_history=trade_arguments.std_history, minmax_history=trade_arguments.minmax_history)
     my_position = create_position(base_currency="ETH", quote_currency="EUR")
     print(my_position)
     stop_loss_position = initiate_stop_loss_trigger(position=my_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)

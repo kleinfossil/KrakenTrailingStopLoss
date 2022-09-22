@@ -6,7 +6,7 @@ from stoploss.collect_data_market import get_last_trade_price
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level, convert_unix_time_to_datetime)
-logger = get_logger("stoploss_logger")
+logger = get_logger("stoploss_logger", "INFO")
 
 def get_interval_as_int(interval):
     try:
