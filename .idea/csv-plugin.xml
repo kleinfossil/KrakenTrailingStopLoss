@@ -3,6 +3,20 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="C:\Users\karst\KarstenHome\01_Projects\16_FreshKraken\coinapi\investment_books\positions_book.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="C:\Users\karst\KarstenHome\01_Projects\16_FreshKraken\coinapi\investment_books\trade_book.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="C:\Users\karst\KarstenHome\01_Projects\16_FreshKraken\coinapi\market_files\1_ohlc_table.csv">
           <value>
             <Attribute>
@@ -11,6 +25,13 @@
           </value>
         </entry>
         <entry key="C:\Users\karst\KarstenHome\01_Projects\16_FreshKraken\datagrab\csv_files\1_ohlc_table.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="C:\Users\karst\KarstenHome\01_Projects\16_FreshKraken\datagrab\csv_files\ts_tables\1645370403_ts_table.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

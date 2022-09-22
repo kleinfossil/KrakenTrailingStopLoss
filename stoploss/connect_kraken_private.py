@@ -27,7 +27,7 @@ def get_secrets(key_type, version):
         match key_type:
             case "query":
                 key = "query-key"
-            case "create":
+            case "trade":
                 key = "create-cancel"
             case "cancel":
                 key = "create-cancel"
@@ -133,7 +133,8 @@ def query_order_info(txid, key_type):
 
 def trade_add_order(trade_dict, key_type):
     endpoint = "AddOrder"
-    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    version = cfg["kraken_private"]["development_keys"]["key_version"]
+    api_key, api_sec = get_secrets(key_type=key_type, version=version)  # Read Kraken API key and secret stored in environment variables
     kill_switch = cfg["debugging"]["kraken"]["kill_switch"]
     if kill_switch == "do_not_trade":
         logger.warning(f"Kill switch is {kill_switch}. No trades will be made")
@@ -141,4 +142,7 @@ def trade_add_order(trade_dict, key_type):
         logger.debug(f"Make request to kraken with following Data: {trade_dict}")
     resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
     trade_execution_check = True
+    logger.debug(f"Trade send to Kraken. Response was: \n"
+                 f"{resp}\n"
+                 f"{resp.json()}")
     return resp.json(), trade_execution_check

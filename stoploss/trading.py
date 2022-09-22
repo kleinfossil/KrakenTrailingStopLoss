@@ -22,14 +22,8 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
     volume = Decimal(round(volume, int(cfg["kraken_trade"]["allowed_decimals"][position.exchange_currency_pair]["volume_decimals"])))
 
     # Create a new trade using price and volume
-    print("--------> Trade------->")
-    print(f"Trade Reason: {trade_reason_message}")
-    print("")
-    print(f"Assets before Trade:")
-    print(position)
-    print("")
-    print(f"Order: {buy_sell_type} - {position.exchange_currency_pair} - Volume: {volume} - Trigger: {price} - Limit Price: {price2} - Order Value: {volume * price}")
-    print("")
+    format_trading_message(message_type="intro", position=position, trade_reason_message=trade_reason_message, buy_sell_type=buy_sell_type,
+                           volume=volume, price=price, price2=price2)
 
     userref = position.position_number
     order_type = cfg["kraken_trade"]["order_type"]
@@ -41,10 +35,26 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(trade)
     trade = post_trade_execution_activities(resp_json, trade_execution_check, trade)
-    print("<----------------------")
+    format_trading_message(message_type="outro", position=position)
 
     return trade
 
 
-def post_trade_execution_activities(self, resp_json, trade_execution_check, trade):
+def format_trading_message(message_type, position, trade_message="Trade", trade_reason_message="", buy_sell_type="", volume: Decimal = 0, price: Decimal = 0.0, price2: Decimal = 0.0):
+    if message_type == "intro":
+        print(f"--------> {trade_message}------->")
+        print(f"Trade Reason: {trade_reason_message}")
+        print("")
+        print(f"Assets before Trade:")
+        print(position)
+        print("")
+        print(f"Order: {buy_sell_type} - {position.exchange_currency_pair} - Volume: {volume} - Trigger: {price} - Limit Price: {price2} - Order Value: {volume * price}")
+        print("")
+    elif message_type == "outro":
+        print("<----------------------")
+    else:
+        raise RuntimeError(f"{message_type=} is not valid for formatting")
+
+
+def post_trade_execution_activities(resp_json, trade_execution_check, trade):
     return trade

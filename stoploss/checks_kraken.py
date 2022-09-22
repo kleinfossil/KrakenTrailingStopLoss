@@ -35,7 +35,7 @@ def check_if_supported_asset_pair(trade_variable):
 # Checks if the order Volume is to low
 def check_if_order_volume_high_enough(trade_variable):
 
-    kraken_min_order = Decimal(cfg["kraken_trade"]["minimum_order"][trade_variable.pair])
+    kraken_min_order = round(Decimal(cfg["kraken_trade"]["minimum_order"][trade_variable.pair]), 3)
     volume = Decimal(trade_variable.volume)
 
     if volume >= kraken_min_order:
@@ -54,7 +54,7 @@ def check_available_funds(trade_variable):
     blocked_funds = get_blocked_funds(trade_variable)
 
     # Step2: Collect the current account balance and add the blocked funds to decide if enough funds are available
-    current_account_balance = get_account_balance()
+    current_account_balance = get_account_balance(key_type="query")
 
     bs = trade_variable.type
     if bs == "sell":

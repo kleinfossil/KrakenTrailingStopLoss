@@ -17,8 +17,8 @@ debugging:
   log-level: "DEBUG"
   use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values.
   kraken:
-    make_trade: 0 # 1 will make a real trade, while 0 will use fake trade data.
-    use_real_trading_data: 1 # 1 will use data as provided to the trade. 0 will overwrite this data with predefined fake data.
+    make_trade: 1 # 1 will make a real trade, while 0 will use fake trade data.
+    use_real_trading_data: 0 # 1 will use data as provided to the trade. 0 will overwrite this data with predefined fake data.
     make_real_query: 1 # 1 will make a real query. 0 will respond with fake data.
     kill_switch: "do_not_trade" # switch setup before every add trade, modify trade and cancel trade kraken call. If 'do_not_trade' then no request to kraken will be made. If 'trade' requests to kraken will be made.
 

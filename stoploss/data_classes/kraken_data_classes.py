@@ -40,18 +40,18 @@ class AddTrade:
     time_executed: str = ""                     # Time when the transaction was executed
     kraken_description: str = ""                # Description from Kraken received in the response
 
-    def set_example_values(self, timeinforce="GTC", expiretm="0"):
+    def set_example_values(self, timeinforce="", expiretm="0"):
         self.nonce = str(int(1000 * time.time()))
-        self.userref = f"kas_{int(time.time())}_ExampleTrade"
-        self.ordertype = "limit"
+        self.userref = "90001000"
+        self.ordertype = "stop-loss-limit"
         self.type = "buy"
-        self.volume = "0.001"
+        self.volume = "0.01"
         self.pair = "XETHZEUR"
         self.price = "10"
         self.price2 = "11"
         self.timeinforce = timeinforce
         self.expiretm = expiretm
-        self.validate = "true"
+        self.validate = "false"
 
     def as_dict(self):
         # returns the class attributes as a dictionary
