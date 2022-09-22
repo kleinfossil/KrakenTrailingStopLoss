@@ -1,6 +1,7 @@
 from stoploss.helper_scripts.helper import get_logger
-from connect_kraken_private import get_secrets
-from checks_kraken import check_order
+from stoploss.connect_kraken_private import get_secrets
+from stoploss.checks_kraken import check_order
+from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
 from yaml.loader import SafeLoader
 

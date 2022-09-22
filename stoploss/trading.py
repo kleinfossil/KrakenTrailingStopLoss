@@ -35,7 +35,8 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
     order_type = cfg["kraken_trade"]["order_type"]
     trade = AddTrade(userref=userref, ordertype=order_type, type=buy_sell_type,
                      volume=str(volume), pair=position.exchange_currency_pair,
-                     price=str(price), price2=str(price), timeinforce="GTC", validate="true")
+                     price=str(price), price2=str(price2), timeinforce="GTC", validate="true")
+
     # Step 3: Check if the trade requires any pre-trade executions. If not, execute Trade
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(trade)

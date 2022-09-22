@@ -14,7 +14,7 @@ def get_account_balance_per_currency(exchange_currency_pair):
 
     logger.debug("Collect real account balance ")
 
-    json_response = get_account_balance()
+    json_response = get_account_balance(key_type="query")
     balances = {}
     for currency in kraken_currencies:
         balances[currency] = json_response["result"][currency]

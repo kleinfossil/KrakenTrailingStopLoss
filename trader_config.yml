@@ -23,8 +23,8 @@ debugging:
 kraken_private:
   google:
     google-secrets: 0 # 1 will use secrets stored in google cloud while 0 will use secrets from the environment variable
-  development-keys:
-    key-location: "D:/07_DevelopmentProjects/01_Kraken/api_keys/api_key_development.yml" # This is only used for development purposes.
+  development_keys:
+    key_location: "D:/07_DevelopmentProjects/01_Kraken/api_keys/api_key_development.yml" # This is only used for development purposes.
     key_version: 220922
 
 kraken_trade:

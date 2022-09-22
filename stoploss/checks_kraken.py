@@ -1,6 +1,6 @@
 from decimal import Decimal
-from collect_data_user import get_account_balance
-from connect_kraken_private import get_open_orders
+from stoploss.collect_data_user import get_account_balance
+from stoploss.connect_kraken_private import get_open_orders
 import yaml
 from yaml.loader import SafeLoader
 from stoploss.helper_scripts.helper import get_logger
@@ -86,7 +86,7 @@ def get_blocked_funds(trade_variable):
     # collect all orders for buy and all orders for sell and provides blocked funds back. Important: Currently works for
     # EURO only
 
-    json_data = get_open_orders(key_type="trade")
+    json_data = get_open_orders(key_type="query")
 
     # Collect blocked funds by multiplying and adding current open order price with open order volume
     open_dict = json_data["result"]["open"]
