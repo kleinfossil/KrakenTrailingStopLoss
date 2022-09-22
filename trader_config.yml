@@ -1,2 +1,5 @@
 basic:
   book-storage-location: D:\07_DevelopmentProjects\01_Kraken\TradingBooks\
+kraken_private:
+  google:
+    google-secrets: 0 # 1 will use secrets stored in google cloud while 0 will use secrets from the environment variable

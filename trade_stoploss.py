@@ -10,12 +10,14 @@ from stoploss.collect_data_market import (
     get_ohlc_dataframe,
     get_indicator_form_ohlc
 )
-from stoploss.collect_data_user import fake_get_account_balance_per_currency
+from stoploss.collect_data_user import get_account_balance_per_currency
 from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger)
 import time
+
+from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 
 logger = get_logger("stoploss_logger")
 
@@ -84,15 +86,17 @@ def create_position(base_currency, quote_currency):
         exchange_currency_pair = "XETHZEUR"
     else:
         raise RuntimeError(f"{base_currency=} and {quote_currency=} are not a supported exchange currency pair.")
-
-    current_volume_of_base_currency = Decimal(fake_get_account_balance_per_currency("XETH").replace(',', '.'))
-    current_volume_of_quote_currency = Decimal(fake_get_account_balance_per_currency("ZEUR").replace(',', '.'))
+    currencies = [base_currency, quote_currency]
+    balances = fake_get_account_balance_per_currency(currencies)
+    deci_balances = {}
+    for currency in currencies:
+        deci_balances[currency] = Decimal(balances[currency].replace(',', '.'))
 
     new_position = Position(base_currency=base_currency,
                             quote_currency=quote_currency,
                             exchange_currency_pair=exchange_currency_pair,
-                            current_volume_of_base_currency=current_volume_of_base_currency,
-                            current_volume_of_quote_currency=current_volume_of_quote_currency,
+                            current_volume_of_base_currency=deci_balances[base_currency],
+                            current_volume_of_quote_currency=deci_balances[quote_currency],
                             )
     return new_position
 

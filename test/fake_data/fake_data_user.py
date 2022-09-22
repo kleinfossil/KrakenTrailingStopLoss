@@ -1,4 +1,4 @@
-def get_account_balance_per_currency(currencies):
+def fake_get_account_balance_per_currency(currencies):
 
     fake_account_balance_json = {
         "result": {

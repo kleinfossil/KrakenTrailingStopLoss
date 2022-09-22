@@ -4,7 +4,7 @@ import traceback
 import logging
 import pandas as pd
 
-from stoploss.connect_kraken import (
+from stoploss.connect_kraken_public import (
     get_ohlc_json,
     get_ticker
 )
