@@ -125,7 +125,7 @@ def trade_position(position):
 
             # Step 2.2: If Order exists. Modify this Order
             elif len(open_orders_per_position) == 1:
-                modified_trade_dict = get_modified_transaction(transaction_dict=open_orders_per_position, buy_sell=buy_sell, trade_dict=trade_dict)
+                modified_position = get_modified_transaction(transaction_dict=open_orders_per_position, position=position)
                 edit_order(position=position, volume=trade_dict["volume"], price=trade_dict["price"], price2=position.trigger,
                            trade_reason_message="Stop Loss Strategy - Modified Order")
 
