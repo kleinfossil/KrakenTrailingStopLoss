@@ -159,7 +159,7 @@ def trade_edit_order(trade_dict, key_type):
         logger.debug(f"Make request to kraken with following Data: {trade_dict}")
     resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
     trade_execution_check = True
-    logger.debug(f"Trade send to Kraken. Response was: \n"
+    logger.debug(f"Edit Trade send to Kraken. Response was: \n"
                  f"{resp}\n"
                  f"{resp.json()}")
     return resp.json(), trade_execution_check

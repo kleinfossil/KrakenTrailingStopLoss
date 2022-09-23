@@ -8,15 +8,16 @@ from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
     convert_datetime_to_unix_time)
-from stoploss.collect_data_user import get_account_balance_per_currency
+from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
 from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger,
     get_buy_or_sell_type,
-    get_limit_price_and_volume)
+    get_limit_price_and_volume,
+    get_modified_transaction)
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
-from stoploss.trading import add_order
+from stoploss.trading import add_order, edit_order
 import yaml
 from yaml.loader import SafeLoader
 
@@ -116,15 +117,25 @@ def trade_position(position):
             trade_dict = get_limit_price_and_volume(position=position, buy_sell_type=buy_sell)
 
             # Step 2: Check open orders and the differences to the current position
-            open_orders = get_open_orders(key_type="query")
+            open_orders_per_position = get_open_orders_for_currency_pair(position.exchange_currency_pair)
 
-            # Step 2.1: If Order exists. Modify this Order
+            # Step 2.1: Check if more then one order exists
+            if len(open_orders_per_position) > 1:
+                raise RuntimeError(f"There is more then one open order for the pair {position.exchange_currency_pair}. The trader is currently not able to handle more then one transaction")
 
+            # Step 2.2: If Order exists. Modify this Order
+            elif len(open_orders_per_position) == 1:
+                modified_trade_dict = get_modified_transaction(transaction_dict=open_orders_per_position, buy_sell=buy_sell, trade_dict=trade_dict)
+                edit_order(position=position, volume=trade_dict["volume"], price=trade_dict["price"], price2=position.trigger,
+                           trade_reason_message="Stop Loss Strategy - Modified Order")
 
-            # Step 3: If no order, create a new order.
-            add_order(position=position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
-                      price=trade_dict["price"], price2=position.trigger,
-                      trade_reason_message="Stop Loss Strategy")
+            # Step 3: If no order, create a new order
+            elif len(open_orders_per_position) == 0:
+                add_order(position=position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
+                          price=trade_dict["price"], price2=position.trigger,
+                          trade_reason_message="Stop Loss Strategy - New Order")
+            else:
+                raise RuntimeError("open positions was negative. This should be not possible")
         else:
             raise RuntimeError("No valid trading strategy found")
     except RuntimeError as e:

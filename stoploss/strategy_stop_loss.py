@@ -103,3 +103,8 @@ def get_limit_price_and_volume(position, buy_sell_type):
 
 def get_stop_trigger(position):
     return position.trigger
+
+
+def get_modified_transaction(transaction_dict, buy_sell, trade_dict):
+
+
