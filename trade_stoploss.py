@@ -2,6 +2,8 @@ import traceback
 import argparse
 import time
 from decimal import Decimal
+
+from stoploss.connect_kraken_private import get_open_orders
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
@@ -109,8 +111,17 @@ def init_trader():
 def trade_position(position):
     try:
         if cfg["trading"]["strategy"]["stop_loss"]["active"] == 1:
+            # Step 1: Get Current Position and define trade trigger
             buy_sell = get_buy_or_sell_type(position)
             trade_dict = get_limit_price_and_volume(position=position, buy_sell_type=buy_sell)
+
+            # Step 2: Check open orders and the differences to the current position
+            open_orders = get_open_orders(key_type="query")
+
+            # Step 2.1: If Order exists. Modify this Order
+
+
+            # Step 3: If no order, create a new order.
             add_order(position=position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
                       price=trade_dict["price"], price2=position.trigger,
                       trade_reason_message="Stop Loss Strategy")

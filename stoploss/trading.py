@@ -39,6 +39,10 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
 
     return trade
 
+def edit_order(position, txid, volume, price, price2, trade_reason_message="NOT PROVIDED"):
+
+
+
 
 def format_trading_message(message_type, position, trade_message="Trade", trade_reason_message="", buy_sell_type="", volume: Decimal = 0, price: Decimal = 0.0, price2: Decimal = 0.0):
     if message_type == "intro":

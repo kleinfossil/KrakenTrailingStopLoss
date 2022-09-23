@@ -146,3 +146,22 @@ def trade_add_order(trade_dict, key_type):
                  f"{resp}\n"
                  f"{resp.json()}")
     return resp.json(), trade_execution_check
+
+
+def trade_edit_order(trade_dict, key_type):
+    endpoint = "EditOrder"
+    version = cfg["kraken_private"]["development_keys"]["key_version"]
+    api_key, api_sec = get_secrets(key_type=key_type, version=version)  # Read Kraken API key and secret stored in environment variables
+    kill_switch = cfg["debugging"]["kraken"]["kill_switch"]
+    if kill_switch == "do_not_trade":
+        logger.warning(f"Kill switch is {kill_switch}. No trades will be made")
+    elif kill_switch == "trade":
+        logger.debug(f"Make request to kraken with following Data: {trade_dict}")
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
+    trade_execution_check = True
+    logger.debug(f"Trade send to Kraken. Response was: \n"
+                 f"{resp}\n"
+                 f"{resp.json()}")
+    return resp.json(), trade_execution_check
+
+
