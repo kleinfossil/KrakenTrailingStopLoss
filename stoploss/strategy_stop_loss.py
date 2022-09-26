@@ -105,7 +105,5 @@ def get_stop_trigger(position):
     return position.trigger
 
 
-def get_modified_transaction(transaction_dict, position):
-
 
 
