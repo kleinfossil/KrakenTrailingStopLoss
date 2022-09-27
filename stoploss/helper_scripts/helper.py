@@ -3,6 +3,7 @@ import math
 import datetime
 import time
 import logging
+from tqdm import tqdm
 
 from stoploss.helper_scripts.formated_logger import CustomFormatter
 
@@ -64,3 +65,8 @@ def set_log_level(logger, log_level):
         case "CRITICAL":
             logger.setLevel(logging.CRITICAL)
     return logger
+
+
+def pretty_waiting_time(waiting_time):
+    for i in tqdm(range(1, waiting_time)):
+        time.sleep(1)

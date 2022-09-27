@@ -7,15 +7,15 @@ from stoploss.connect_kraken_private import get_open_orders
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
-    convert_datetime_to_unix_time)
+    convert_datetime_to_unix_time,
+    pretty_waiting_time)
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
 from stoploss.data_classes.Position import Position
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger,
     get_buy_or_sell_type,
-    get_limit_price_and_volume,
-    get_modified_position)
+    get_limit_price_and_volume)
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
 import yaml
@@ -121,43 +121,50 @@ def trade_position(base_currency, quote_currency):
     try:
         pair = get_currency_pair(base_currency=base_currency, quote_currency=quote_currency)
         if cfg["trading"]["strategy"]["stop_loss"]["active"] == 1:
-            # Step: Check open orders and the differences to the current position
+            # Check open orders and the differences to the current position
             orders_in_scope = get_open_orders_for_currency_pair(pair)
 
-
-
-
-            # Step 2.1: Check if more then one order exists
+            # Check if more then one order exists
             if len(orders_in_scope) > 1:
                 raise RuntimeError(f"There is more then one open order for the pair {pair}. The trader is currently not able to handle more then one transaction")
 
             # Step 2.2: If Order exists. Modify this Order
             elif len(orders_in_scope) == 1:
+                txids = []
+                # Collect the one order and get all important values
                 for order in orders_in_scope:
-                    active_position = Position(base_currency=base_currency,
-                                            quote_currency=quote_currency,
-                                            exchange_currency_pair=pair,
-                                            current_volume_of_base_currency=Decimal(order[""[base_currency].replace(',', '.')),
-                                            current_volume_of_quote_currency=Decimal(balances[quote_currency].replace(',', '.')),
-                                            )
+                    txids.append(order)
+                price2 = Decimal(orders_in_scope[txids[0]]["descr"]["price2"])
+                volume_base = Decimal(orders_in_scope[txids[0]]["vol"])
+                bstype = orders_in_scope[txids[0]]["descr"]["type"]
 
+                volume_quote = price2 * volume_base
 
+                active_position = Position(base_currency=base_currency,
+                                           quote_currency=quote_currency,
+                                           exchange_currency_pair=pair,
+                                           current_volume_of_base_currency=volume_base,
+                                           current_volume_of_quote_currency=volume_quote
+                                           )
 
-
-
-
-
-                modified_position = get_modified_position(transaction_dict=orders_in_scope)
-                buy_sell = get_buy_or_sell_type(modified_position)
-                trade_dict = get_limit_price_and_volume(position=modified_position, buy_sell_type=buy_sell)
-                edit_order(position=modified_position, volume=trade_dict["volume"], price=trade_dict["price"], price2=position.trigger,
-                           trade_reason_message="Stop Loss Strategy - Modified Order")
+                stop_loss_position = initiate_stop_loss_trigger(position=active_position,
+                                                                std_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_interval"],
+                                                                std_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_history"],
+                                                                minmax_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_interval"],
+                                                                minmax_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_history"])
+                trade_dict = get_limit_price_and_volume(position=stop_loss_position.position, buy_sell_type=bstype)
+                edit_order(position=active_position, volume=trade_dict["volume"], price=trade_dict["price"], price2=stop_loss_position.position.trigger,
+                           trade_reason_message="Stop Loss Strategy - Modified Order", buy_sell_type=bstype, txid=txids[0])
 
             # Step 3: If no order, create a new order
             elif len(orders_in_scope) == 0:
                 active_position = create_position(base_currency, quote_currency)
                 buy_sell = get_buy_or_sell_type(active_position)
-                stop_loss_position = initiate_stop_loss_trigger(position=active_position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
+                stop_loss_position = initiate_stop_loss_trigger(position=active_position,
+                                                                std_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_interval"],
+                                                                std_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_history"],
+                                                                minmax_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_interval"],
+                                                                minmax_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_history"])
                 trade_dict = get_limit_price_and_volume(position=stop_loss_position.position, buy_sell_type=buy_sell)
                 add_order(position=stop_loss_position.position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
                           price=trade_dict["price"], price2=stop_loss_position.position.trigger,
@@ -179,9 +186,6 @@ if __name__ == "__main__":
 
 
 
-    # initiate stop loss trigger
-
-
     # lock finish time
     time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
     logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
@@ -189,9 +193,10 @@ if __name__ == "__main__":
     # Start trading
     while time_till_finish >= time.time():
         trade_position(base_currency=base, quote_currency=quote)
+        pretty_waiting_time(cfg["trading"]["waiting_time"])
         # update trigger with stop_loss_interval
-        update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
+        # update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
         # trade stop loss position
-        print(f" Current StopLoss Position Trigger: {stop_loss_position.position.trigger}")
+        # print(f" Current StopLoss Position Trigger: {stop_loss_position.position.trigger}")
 
 

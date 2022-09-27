@@ -107,6 +107,14 @@ def get_blocked_funds(trade_variable):
         else:
             raise RuntimeError(f"{descr_dict['type']} is not a valid Order Type. Must be 'buy' or 'sell'.")
 
+    # Adjust the blocked values in case the trade is an edit order. In this case the blocked funds are reduced by the open order
+    if trade_variable.trade_type == "EditOrder":
+        if trade_variable.type == "buy":
+            blocked_fiat["volume"] = Decimal(blocked_fiat["volume"]) - (Decimal(trade_variable.price2*Decimal(trade_variable.volume)))
+        elif trade_variable.type == "sell":
+            blocked_coin["volume"] = Decimal(blocked_coin["volume"]) - Decimal(trade_variable.volume)
+
+
     if trade_variable.type == "buy":
         blocked_funds = blocked_fiat
     elif trade_variable.type == "sell":

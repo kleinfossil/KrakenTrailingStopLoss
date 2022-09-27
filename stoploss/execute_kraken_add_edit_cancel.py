@@ -1,5 +1,5 @@
 from stoploss.helper_scripts.helper import get_logger
-from stoploss.connect_kraken_private import get_secrets, trade_add_order
+from stoploss.connect_kraken_private import get_secrets, trade_add_order, trade_edit_order
 from stoploss.checks_kraken import check_order
 from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
@@ -13,10 +13,7 @@ logger = get_logger("stoploss_logger")
 
 def execute_order(trade_variable):
     # Place a new Order
-    # See: https://docs.kraken.com/rest/#operation/addOrder
-
-    # Construct the request and return the result
-    api_url = "https://api.kraken.com"
+    # See: https://docs.kraken.com/rest/
 
     make_trade = int(cfg["debugging"]["kraken"]["make_trade"])
     use_real_data = int(cfg["debugging"]["kraken"]["use_real_trading_data"])
@@ -26,7 +23,12 @@ def execute_order(trade_variable):
             if check_order(trade_variable):
                 if ask_for_order_execution(trade_variable, make_trade, use_real_data):
                     data = trade_variable.as_dict()
-                    resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
+                    match trade_variable.trade_type:
+                        case "AddTrade":
+                            resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
+                        case "EditOrder":
+                            resp, trade_execution_check = trade_edit_order(trade_dict=data, key_type="trade")
+                        case _: raise RuntimeError(f"{trade_variable.trade_type} is not a valid trading type")
                 else:
                     trade_execution_check = False
                     print(f"Trade was not approved by user!")
@@ -42,7 +44,13 @@ def execute_order(trade_variable):
             if check_order(trade_variable):
                 if ask_for_order_execution(trade_variable, make_trade, use_real_data):
                     data = trade_variable.as_dict()
-                    resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
+                    match trade_variable.trade_type:
+                        case "AddTrade":
+                            resp, trade_execution_check = trade_add_order(trade_dict=data, key_type="trade")
+                        case "EditTrade":
+                            resp, trade_execution_check = trade_edit_order(trade_dict=data, key_type="trade")
+                        case _:
+                            raise RuntimeError(f"{trade_variable.trade_type} is not a valid trading type")
                 else:
                     trade_execution_check = False
                     print(f"Trade was not approved by user!")
@@ -57,6 +65,8 @@ def execute_order(trade_variable):
             trade_execution_check = False
             resp = ""
     else:
+        # Construct the request and return the result
+        api_url = "https://api.kraken.com"
         logger.warning(f"Make a Fake Trade! Change trader_config 'make_trade' to 1 for real trades. "
                        f"Potential Call would be: {api_url},{trade_variable} "
                        f"Notice: Api key and secret not shown in log ")

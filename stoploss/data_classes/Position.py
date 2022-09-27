@@ -22,7 +22,7 @@ class Position:
     current_volume_of_quote_currency: Decimal     # Current volume of quote currency. e.g. 0.01
     trigger: Decimal = 0                          # Trigger for stop loss
 
-    position_number: str = f"P-{int(time.time())}"  # Position number to identify related trades
+    position_number: int = int(time.time())   # Position number to identify related trades
 
     def __post_init__(self):
         # Make the first entry into the Positions-Book after creation of a position

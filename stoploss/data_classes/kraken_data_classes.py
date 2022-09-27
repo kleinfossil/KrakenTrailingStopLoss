@@ -5,8 +5,9 @@ from uuid import uuid4
 
 @dataclass
 class AddTrade:
+    trade_type: str = "AddTrade"                # The name of this dataclass
     uuid: uuid4 = uuid4().hex
-    nonce: str = str(int(1000 * time.time()))   # User Signed API header. Must be always increasing number
+    nonce: str = str(int(time.time()))   # User Signed API header. Must be always increasing number
     userref: str = ""                           # Optional User Reference. Must be Int32!
     ordertype: str = ""                         # market, limit, stop-loss, take-profit, stop-loss-limit,
                                                 # take-profit-limit, settle-position
@@ -41,7 +42,7 @@ class AddTrade:
     kraken_description: str = ""                # Description from Kraken received in the response
 
     def set_example_values(self, timeinforce="", expiretm="0"):
-        self.nonce = str(int(1000 * time.time()))
+        self.nonce = str(int(time.time()))
         self.userref = "90001000"
         self.ordertype = "stop-loss-limit"
         self.type = "buy"
@@ -73,13 +74,14 @@ class AddTrade:
 
 @dataclass
 class EditOrder:
+    trade_type: str = "EditOrder"               # The name of this dataclass
     uuid: uuid4 = uuid4().hex                   # Internal ID
-    nonce: str = str(int(1000 * time.time()))   # User Signed API header. Must be always increasing number
+    nonce: str = str(int(time.time()))          # User Signed API header. Must be always increasing number
     userref: str = ""                           # Optional User Reference. Must be Int32!
     txid: str = ""                               # Original Order ID or User Reference ID. If user reference is not unique, request will be denied.
     # ordertype: str = ""                         # market, limit, stop-loss, take-profit, stop-loss-limit,
                                                 # take-profit-limit, settle-position
-    # type: str = ""                              # buy, sell
+    type: str = ""                              # buy, sell
     volume: str = ""                            # Order quantity in terms of the base asset
     pair: str = ""                              # Asset Pair
     price: str = ""                             # Asset Price. in Quote Currency Limit price for Limit orders/ Trigger price
@@ -110,11 +112,11 @@ class EditOrder:
     kraken_description: str = ""                # Description from Kraken received in the response
 
     def set_example_values(self, timeinforce="", expiretm="0"):
-        self.nonce = str(int(1000 * time.time()))
+        self.nonce = str(int(time.time()))
         self.userref = "90001000"
         self.txid = "OHVFK7-BF5HY-PHECAP"
         # self.ordertype = "stop-loss-limit"
-        # self.type = "buy"
+        self.type = "buy"
         self.volume = "0.01"
         self.pair = "XETHZEUR"
         self.price = "10"

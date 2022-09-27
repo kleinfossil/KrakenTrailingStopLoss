@@ -20,14 +20,16 @@ def test_get_open_orders():
 
 def test_get_only_ETH_tx():
     resp = get_open_orders_for_currency_pair("XETHZEUR")
-
+    txids = []
+    for order in resp:
+        txids.append(order)
     print(resp)
+    price = resp[txids[0]]["descr"]["price"]
+    price2 = resp[txids[0]]["descr"]["price2"]
+    volume = resp[txids[0]]["vol"]
+    bstype = resp[txids[0]]["descr"]["type"]
 
-
-
-
-
-
+    print(f"{price=}, {price2=}, {volume=}, {bstype=}")
 
 if __name__ == "__main__":
     # test_query_order_info()
