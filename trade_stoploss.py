@@ -15,7 +15,7 @@ from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger,
     get_buy_or_sell_type,
-    get_limit_price_and_volume)
+    get_limit_price_and_volume, update_stop_loss_trigger2)
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
 import yaml
@@ -134,6 +134,7 @@ def trade_position(base_currency, quote_currency):
                 # Collect the one order and get all important values
                 for order in orders_in_scope:
                     txids.append(order)
+                price = Decimal(orders_in_scope[txids[0]]["descr"]["price"])
                 price2 = Decimal(orders_in_scope[txids[0]]["descr"]["price2"])
                 volume_base = Decimal(orders_in_scope[txids[0]]["vol"])
                 bstype = orders_in_scope[txids[0]]["descr"]["type"]
@@ -144,14 +145,15 @@ def trade_position(base_currency, quote_currency):
                                            quote_currency=quote_currency,
                                            exchange_currency_pair=pair,
                                            current_volume_of_base_currency=volume_base,
-                                           current_volume_of_quote_currency=volume_quote
+                                           current_volume_of_quote_currency=volume_quote,
+                                           trigger=price
                                            )
 
-                stop_loss_position = initiate_stop_loss_trigger(position=active_position,
-                                                                std_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_interval"],
-                                                                std_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_history"],
-                                                                minmax_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_interval"],
-                                                                minmax_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_history"])
+                stop_loss_position = update_stop_loss_trigger2(position=active_position,
+                                                               std_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_interval"],
+                                                               std_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_history"],
+                                                               minmax_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_interval"],
+                                                               minmax_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_history"])
                 trade_dict = get_limit_price_and_volume(position=stop_loss_position.position, buy_sell_type=bstype)
                 edit_order(position=active_position, volume=trade_dict["volume"], price=trade_dict["price"], price2=stop_loss_position.position.trigger,
                            trade_reason_message="Stop Loss Strategy - Modified Order", buy_sell_type=bstype, txid=txids[0])

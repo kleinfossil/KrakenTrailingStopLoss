@@ -76,7 +76,7 @@ class AddTrade:
 class EditOrder:
     trade_type: str = "EditOrder"               # The name of this dataclass
     uuid: uuid4 = uuid4().hex                   # Internal ID
-    nonce: str = str(int(time.time())*1000)          # User Signed API header. Must be always increasing number
+    nonce: str = ""         # User Signed API header. Must be always increasing number
     userref: str = ""                           # Optional User Reference. Must be Int32!
     txid: str = ""                               # Original Order ID or User Reference ID. If user reference is not unique, request will be denied.
     # ordertype: str = ""                         # market, limit, stop-loss, take-profit, stop-loss-limit,
@@ -110,6 +110,9 @@ class EditOrder:
     executed: str = "False"                     # Was the Transaction executed
     time_executed: str = ""                     # Time when the transaction was executed
     kraken_description: str = ""                # Description from Kraken received in the response
+
+    def __post_init__(self):
+        self.nonce = str(int(time.time()) * 1000)
 
     def set_example_values(self, timeinforce="", expiretm="0"):
         self.nonce = str(int(time.time()))
