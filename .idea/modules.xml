@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/StopLoss.iml" filepath="$PROJECT_DIR$/.idea/StopLoss.iml" />
-      <module fileurl="file://$USER_HOME$/KarstenHome/01_Projects/16_FreshKraken/coinapi/.idea/coinapi.iml" filepath="$USER_HOME$/KarstenHome/01_Projects/16_FreshKraken/coinapi/.idea/coinapi.iml" />
-      <module fileurl="file://$USER_HOME$/KarstenHome/01_Projects/16_FreshKraken/datagrab/.idea/datagrab.iml" filepath="$USER_HOME$/KarstenHome/01_Projects/16_FreshKraken/datagrab/.idea/datagrab.iml" />
     </modules>
   </component>
 </project>

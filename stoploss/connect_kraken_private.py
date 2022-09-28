@@ -104,7 +104,44 @@ def get_open_orders(key_type):
         "nonce": str(int(1000 * time.time())),
         "trades": True
     }, api_key, api_sec)
-    logger.info(f"Open Orders received from Kraken. Orders: {str(resp.json())}")
+    logger.debug(f"Open Orders received from Kraken. Orders: {str(resp.json())}")
+    return resp.json()
+
+
+def get_closed_orders(key_type):
+    endpoint = "ClosedOrders"
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    # Construct the request and return the result
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+        "nonce": str(int(1000 * time.time())),
+        "trades": True
+    }, api_key, api_sec)
+    logger.debug(f"Closed Orders received from Kraken. Orders: {str(resp.json())}")
+    return resp.json()
+
+
+def get_trades_history(key_type):
+    endpoint = "TradesHistory"
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    # Construct the request and return the result
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+        "nonce": str(int(1000 * time.time())),
+        "trades": True
+    }, api_key, api_sec)
+    logger.debug(f"Trades History Received from Kraken. Trades: {str(resp.json())}")
+    return resp.json()
+
+
+def get_trade(txid, key_type):
+    endpoint = "QueryTrades"
+    api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
+    # Construct the request and return the result
+    resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+        "nonce": str(int(1000 * time.time())),
+        "txid": txid,
+        "trades": True
+    }, api_key, api_sec)
+    logger.debug(f"Specific Information about a Trade received from Kraken. Trade Details: {str(resp.json())}")
     return resp.json()
 
 

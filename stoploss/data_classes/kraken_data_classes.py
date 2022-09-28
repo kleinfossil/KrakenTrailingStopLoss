@@ -147,3 +147,19 @@ class EditOrder:
                 value = getattr(self, attribute, None)
                 if value != "":
                     print(f"{attribute}: {value}")
+
+
+@dataclass
+class Trade:
+    ordertxid: str  # Order responsible for execution of trade.
+    pair: str       # Asset pair. e.g. XETHZEUR
+    time: str
+    type: str
+    ordertype: str
+    price: str
+    cost: str
+    fee: str
+    vol: str
+    margin: str
+    misc: str
+

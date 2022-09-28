@@ -176,12 +176,16 @@ def trade_position(base_currency, quote_currency, current_std):
                           trade_reason_message="Stop Loss Strategy - New Order")
             else:
                 raise RuntimeError("open positions was negative. This should be not possible")
-            return updated_position.current_std
+            return updated_position
         else:
             raise RuntimeError("No valid trading strategy found")
     except RuntimeError as e:
         logger.error(traceback.print_stack(), e)
 
+
+def post_trade(position):
+    # Everything what will happen after a position was traded
+    position.add_to_position_book()
 
 
 if __name__ == "__main__":
@@ -191,22 +195,23 @@ if __name__ == "__main__":
     base = cfg["trading"]["position"]["base_currency"]
     quote = cfg["trading"]["position"]["quote_currency"]
 
-
-
     # lock finish time
     time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
     logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
 
-    # Start trading
+    # std_change is a value which should be take over from trade to trade. Therefore it is defined outside the trading loop
     std_change: Decimal = Decimal(0)
+
+    # Start trading
     while time_till_finish >= time.time():
         logger.debug(f"Before trading: {std_change=}")
-        std_change = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
+        traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
+        std_change = traded_position.current_std
         logger.debug(f"After trading: {std_change=}")
+
+        post_trade(traded_position)
+
         pretty_waiting_time(cfg["trading"]["waiting_time"])
-        # update trigger with stop_loss_interval
-        # update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)
-        # trade stop loss position
-        # print(f" Current StopLoss Position Trigger: {stop_loss_position.position.trigger}")
+
 
 

@@ -51,7 +51,6 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
     # Step 3: Check if the trade requires any pre-trade executions. If not, execute Trade
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(trade)
-    trade = post_trade_execution_activities(resp_json, trade_execution_check, trade)
     format_trading_message(message_type="outro", position=position)
 
     return trade
@@ -69,7 +68,6 @@ def edit_order(position, txid, buy_sell_type, volume, price, price2, trade_reaso
     # Step 3: Check if the trade requires any pre-trade executions. If not, execute Trade
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(modified_order)
-    trade = post_trade_execution_activities(resp_json, trade_execution_check, modified_order)
     format_trading_message(message_type="outro", position=position)
 
 
@@ -90,6 +88,3 @@ def format_trading_message(message_type, position, trade_message="Trade", trade_
     else:
         raise RuntimeError(f"{message_type=} is not valid for formatting")
 
-
-def post_trade_execution_activities(resp_json, trade_execution_check, trade):
-    return trade

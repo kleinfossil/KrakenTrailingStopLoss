@@ -104,6 +104,8 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     df_ohlc_minmax = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=mmi)
     high = get_indicator_form_ohlc(df=df_ohlc_minmax, indicator="max", history_length=minmax_history)
     low = get_indicator_form_ohlc(df=df_ohlc_minmax, indicator="min", history_length=minmax_history)
+    position.current_high = high
+    position.current_low = low
 
     # Collect two std's. The current and one period before. This way I can compare if the std has changed.
     df_ohlc_std = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=stdi)
@@ -115,6 +117,7 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     position.current_std = std
 
     last_trade_price = get_last_trade_price(position.exchange_currency_pair)
+    position.current_trade_price = last_trade_price
 
     print(f"\n"
           f"Old Standard Deviation: {std_before} / New Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}")
