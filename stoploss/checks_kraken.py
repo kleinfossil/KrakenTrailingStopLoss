@@ -90,8 +90,8 @@ def get_blocked_funds(trade_variable):
 
     # Collect blocked funds by multiplying and adding current open order price with open order volume
     open_dict = json_data["result"]["open"]
-    blocked_fiat = {"volume": 0.0, "type": "", "pair": ""}
-    blocked_coin = {"volume": 0.0, "type": "", "pair": ""}
+    blocked_fiat = {"volume": Decimal(0.0), "type": "", "pair": ""}
+    blocked_coin = {"volume": Decimal(0.0), "type": "", "pair": ""}
     for txid_key in open_dict.values():
         descr_dict = txid_key["descr"]
         if descr_dict["type"] == "buy":
@@ -110,10 +110,9 @@ def get_blocked_funds(trade_variable):
     # Adjust the blocked values in case the trade is an edit order. In this case the blocked funds are reduced by the open order
     if trade_variable.trade_type == "EditOrder":
         if trade_variable.type == "buy":
-            blocked_fiat["volume"] = Decimal(blocked_fiat["volume"]) - (Decimal(trade_variable.price2*Decimal(trade_variable.volume)))
+            blocked_fiat["volume"] = Decimal(blocked_fiat["volume"]) - (Decimal(trade_variable.price2)*Decimal(trade_variable.volume))
         elif trade_variable.type == "sell":
             blocked_coin["volume"] = Decimal(blocked_coin["volume"]) - Decimal(trade_variable.volume)
-
 
     if trade_variable.type == "buy":
         blocked_funds = blocked_fiat

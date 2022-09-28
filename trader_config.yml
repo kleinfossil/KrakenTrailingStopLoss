@@ -3,7 +3,7 @@ basic:
 
 trading:
   supported_currencies: XETHZEUR
-  waiting_time: 10
+  waiting_time: 600
   position:
     base_currency: "XETH"
     quote_currency: "ZEUR"
