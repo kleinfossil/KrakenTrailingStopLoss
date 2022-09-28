@@ -10,7 +10,7 @@ from stoploss.helper_scripts.helper import (
     convert_datetime_to_unix_time,
     pretty_waiting_time)
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
-from stoploss.data_classes.Position import Position
+from stoploss.data_classes.Position import Position, Order
 from stoploss.strategy_stop_loss import (
     initiate_stop_loss_trigger,
     update_stop_loss_trigger,
@@ -141,15 +141,19 @@ def trade_position(base_currency, quote_currency):
 
                 volume_quote = price2 * volume_base
 
-                active_position = Position(base_currency=base_currency,
-                                           quote_currency=quote_currency,
-                                           exchange_currency_pair=pair,
-                                           current_volume_of_base_currency=volume_base,
-                                           current_volume_of_quote_currency=volume_quote,
-                                           trigger=price
-                                           )
+                active_position = create_position(base_currency, quote_currency)
+                active_order = Order(
+                    txid=txids[0],
+                    base_currency=base_currency,
+                    quote_currency=quote_currency,
+                    exchange_currency_pair=pair,
+                    price=price,
+                    price2=price2,
+                    volume_base=volume_base,
+                    volume_quote=volume_quote
+                )
 
-                stop_loss_position = update_stop_loss_trigger2(position=active_position,
+                stop_loss_position = update_stop_loss_trigger2(position=active_position, order=active_order,
                                                                std_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_interval"],
                                                                std_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["standard_deviation_history"],
                                                                minmax_interval=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_interval"],

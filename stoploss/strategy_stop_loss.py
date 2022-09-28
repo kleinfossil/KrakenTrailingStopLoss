@@ -49,9 +49,11 @@ def initiate_stop_loss_trigger(position, std_interval="d", std_history=10, minma
         logger.error(f"{traceback.print_stack()} {e}")
 
 
-def update_stop_loss_trigger2(position, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24):
+def update_stop_loss_trigger2(position, order, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24):
     stdi = get_interval_as_int(std_interval)
     mmi = get_interval_as_int(minmax_interval)
+    position.trigger = order.price
+
     try:
         if position.trigger > 0:
             # Create initial trigger

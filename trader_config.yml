@@ -37,7 +37,7 @@ kraken_private:
     key_version: 220922
 
 kraken_trade:
-  trade_requires_approval: 0 # 1 will have the trader wait for approval. 0 will not require a approval
+  trade_requires_approval: 1 # 1 will have the trader wait for approval. 0 will not require a approval
   order_type: stop-loss-limit
   allowed_decimals:
     XETHZEUR:

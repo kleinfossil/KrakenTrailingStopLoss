@@ -1,6 +1,6 @@
 import unittest
 from stoploss.connect_kraken_private import query_order_info, get_open_orders
-from stoploss.collect_data_user import get_open_orders_for_currency_pair
+from stoploss.collect_data_user import get_open_orders_for_currency_pair, get_account_balance_per_currency
 import json
 
 
@@ -31,7 +31,14 @@ def test_get_only_ETH_tx():
 
     print(f"{price=}, {price2=}, {volume=}, {bstype=}")
 
+
+def test_get_account_balances():
+    balances = get_account_balance_per_currency("XETHZEUR")
+    print(balances)
+
+
 if __name__ == "__main__":
     # test_query_order_info()
     # test_get_open_orders()
-    test_get_only_ETH_tx()
+    # test_get_only_ETH_tx()
+    test_get_account_balances()
