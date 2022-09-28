@@ -78,7 +78,7 @@ def get_currency_pair(base_currency, quote_currency):
         logger.error(traceback.print_stack(),e)
 
 
-def create_position(base_currency, quote_currency):
+def create_position(base_currency, quote_currency, current_std):
     try:
         exchange_currency_pair = get_currency_pair(base_currency=base_currency, quote_currency=quote_currency)
         if cfg["debugging"]["use-fake-user-balance"] == 1:
@@ -94,6 +94,7 @@ def create_position(base_currency, quote_currency):
                                 exchange_currency_pair=exchange_currency_pair,
                                 current_volume_of_base_currency=Decimal(balances[base_currency].replace(',', '.')),
                                 current_volume_of_quote_currency=Decimal(balances[quote_currency].replace(',', '.')),
+                                current_std=current_std
                                 )
         return new_position
     except RuntimeError as e:
@@ -136,9 +137,9 @@ def select_order_in_scope(orders_in_scope, base_currency, quote_currency, pair):
     return active_order
 
 
-def trade_position(base_currency, quote_currency):
+def trade_position(base_currency, quote_currency, current_std):
     try:
-        active_position = create_position(base_currency, quote_currency)
+        active_position = create_position(base_currency, quote_currency, current_std)
         if cfg["trading"]["strategy"]["stop_loss"]["active"] == 1:
             # Check open orders and the differences to the current position
             orders_in_scope = get_open_orders_for_currency_pair(active_position.exchange_currency_pair)
@@ -158,7 +159,7 @@ def trade_position(base_currency, quote_currency):
 
                 bstype = orders_in_scope[active_order.txid]["descr"]["type"]
                 trade_dict = get_limit_price_and_volume(position=updated_position, buy_sell_type=bstype)
-                edit_order(position=updated_position, volume=trade_dict["volume"], price=trade_dict["price"], price2=updated_position.trigger,
+                edit_order(position=updated_position, volume=trade_dict["volume"], price2=trade_dict["price"], price=updated_position.trigger,
                            trade_reason_message="Stop Loss Strategy - Modified Order", buy_sell_type=bstype, txid=active_order.txid)
 
             # Step 3: If no order, create a new order
@@ -171,14 +172,16 @@ def trade_position(base_currency, quote_currency):
                                                                minmax_history=cfg["trading"]["strategy"]["stop_loss"]["config"]["minmax_history"])
                 trade_dict = get_limit_price_and_volume(position=updated_position, buy_sell_type=buy_sell)
                 add_order(position=updated_position, buy_sell_type=buy_sell, volume=trade_dict["volume"],
-                          price=trade_dict["price"], price2=updated_position.trigger,
+                          price2=trade_dict["price"], price=updated_position.trigger,
                           trade_reason_message="Stop Loss Strategy - New Order")
             else:
                 raise RuntimeError("open positions was negative. This should be not possible")
+            return updated_position.current_std
         else:
             raise RuntimeError("No valid trading strategy found")
     except RuntimeError as e:
         logger.error(traceback.print_stack(), e)
+
 
 
 if __name__ == "__main__":
@@ -195,8 +198,11 @@ if __name__ == "__main__":
     logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
 
     # Start trading
+    std_change: Decimal = Decimal(0)
     while time_till_finish >= time.time():
-        trade_position(base_currency=base, quote_currency=quote)
+        logger.debug(f"Before trading: {std_change=}")
+        std_change = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
+        logger.debug(f"After trading: {std_change=}")
         pretty_waiting_time(cfg["trading"]["waiting_time"])
         # update trigger with stop_loss_interval
         # update_stop_loss_trigger(stop_loss_position=stop_loss_position, repeat_time=trade_arguments.stop_loss_interval, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24)

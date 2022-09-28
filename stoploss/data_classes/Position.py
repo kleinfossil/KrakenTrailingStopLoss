@@ -20,8 +20,9 @@ class Position:
                                                 # Used for easier interaction with the exchange platform
     current_volume_of_base_currency: Decimal      # Current volume of base currency. e.g. 100
     current_volume_of_quote_currency: Decimal     # Current volume of quote currency. e.g. 0.01
-    position_number: int = 0   # Position number to identify related trades
-    trigger: Decimal = 0  # Trigger for stop loss
+    position_number: int = 0                    # Position number to identify related trades
+    trigger: Decimal = 0                        # Trigger for stop loss
+    current_std: Decimal = 0                     # Current standard deviation
 
     def __post_init__(self):
         # Make the first entry into the Positions-Book after creation of a position
