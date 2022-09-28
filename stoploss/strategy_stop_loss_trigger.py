@@ -1,10 +1,21 @@
 from stoploss.collect_data_market import get_ohlc_dataframe, get_indicator_form_ohlc, get_last_trade_price
 from stoploss.helper_scripts.helper import get_logger
+from stoploss.strategy_stop_loss import get_interval_as_int
+from decimal import Decimal
 
 logger = get_logger("stoploss_logger")
 
 
 def set_new_trigger(position, std, std_before, high, low, last_trade_price):
+    # Ensure that the data type is Decimal and not float
+    new_trigger: Decimal
+    std_delta: Decimal
+    std = Decimal(str(std))
+    std_before = Decimal(str(std_before))
+    high = Decimal(str(high))
+    low = Decimal(str(low))
+    last_trade_price = Decimal(str(last_trade_price))
+
 
     # Sell Position / Trigger below current price / Move trigger up when price rises
     if position.current_volume_of_base_currency > 0:
@@ -76,26 +87,32 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     # If Order is none: calculate a new trigger based on min or max and the current position
     # If Order is not none: use the existing trigger and calculate a new one
 
-    df_ohlc_minmax = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=minmax_interval)
+    # Resolve the interval from string to int
+    stdi = get_interval_as_int(std_interval)
+    mmi = get_interval_as_int(minmax_interval)
+
+    df_ohlc_minmax = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=mmi)
     high = get_indicator_form_ohlc(df=df_ohlc_minmax, indicator="max", history_length=minmax_history)
     low = get_indicator_form_ohlc(df=df_ohlc_minmax, indicator="min", history_length=minmax_history)
 
     # Collect two std's. The current and one period before. This way I can compare if the std has changed.
-    df_ohlc_std = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=std_interval)
+    df_ohlc_std = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=stdi)
     df_ohlc_std_before = df_ohlc_std.iloc[:-1, :]  # Structure: df.iloc[row_start:row_end , col_start, col_end]
     std = get_indicator_form_ohlc(df=df_ohlc_std, indicator="std", history_length=std_history)
     std_before = get_indicator_form_ohlc(df=df_ohlc_std_before, indicator="std", history_length=std_history)
 
     last_trade_price = get_last_trade_price(position.exchange_currency_pair)
 
+    print(f"\n"
+          f"Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}")
+
     if order is not None:
         logger.debug(f"There was an order provided. Calculate stop loss trigger based on existing order. Trigger Price was {order.price} {order.quote_currency}")
-        position.trigger = order.price
+        position.trigger = Decimal(order.price)
 
+    # Update Trigger
+    print(f"Current Trigger: {position.trigger} {position.quote_currency}")
     position = set_new_trigger(position, std, std_before, high, low, last_trade_price)
-
-    print(f"\n"
-          f"Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}\n"
-          f"Current Trigger: {position.trigger} {position.quote_currency}")
+    print(f"New Trigger: {position.trigger} {position.quote_currency}")
 
     return position

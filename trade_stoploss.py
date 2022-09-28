@@ -2,8 +2,6 @@ import traceback
 import argparse
 import time
 from decimal import Decimal
-
-from stoploss.connect_kraken_private import get_open_orders
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
@@ -12,10 +10,8 @@ from stoploss.helper_scripts.helper import (
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
 from stoploss.data_classes.Position import Position, Order
 from stoploss.strategy_stop_loss import (
-    initiate_stop_loss_trigger,
-    update_stop_loss_trigger,
     get_buy_or_sell_type,
-    get_limit_price_and_volume, update_stop_loss_trigger2)
+    get_limit_price_and_volume)
 from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
