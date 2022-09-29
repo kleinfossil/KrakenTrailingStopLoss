@@ -12,7 +12,7 @@ api_path = "/0/public/"
 
 
 def make_public_data_request(api_request, request_try=3):
-    logger.info(f"Preparing URL Request: {api_request}")
+    logger.info(f"Preparing URL Public Request: {api_request}")
     request_finished = False
     request_attempts = 0
     try:

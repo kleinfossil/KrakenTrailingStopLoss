@@ -1,5 +1,5 @@
 basic:
-  book-storage-location: D:\07_DevelopmentProjects\01_Kraken\TradingBooks\
+  book-storage-location: books\
 
 trading:
   supported_currencies: XETHZEUR
@@ -32,6 +32,10 @@ debugging:
 kraken_private:
   google:
     google-secrets: 0 # 1 will use secrets stored in google cloud while 0 will use secrets from the environment variable
+    google-project-id: "250571186544" # can be found right at the details page of the secret under the headline
+    google-key-name: "kraken-key"
+    google-sec-name: "kraken-sec"
+    google-secret-version: "latest"
   development_keys:
     key_location: "D:/07_DevelopmentProjects/01_Kraken/api_keys/api_key_development.yml" # This is only used for development purposes.
     key_version: 220922

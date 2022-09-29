@@ -1,6 +1,21 @@
 from google.cloud import secretmanager
 from stoploss.helper_scripts.helper import get_logger
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
 logger = get_logger("stoploss_logger")
+
+
+def get_key_and_secret_from_google():
+    google_secret = {"key": access_secret_version(cfg["kraken_private"]["google"]["google-project-id"],
+                                                  cfg["kraken_private"]["google"]["google-key-name"],
+                                                  cfg["kraken_private"]["google"]["google-secret-version"]),
+                     "sec": access_secret_version(cfg["kraken_private"]["google"]["google-project-id"],
+                                                  cfg["kraken_private"]["google"]["google-sec-name"],
+                                                  cfg["kraken_private"]["google"]["google-secret-version"])}
+    return google_secret
 
 
 def access_secret_version(project_id, secret_id, version_id):
@@ -20,6 +35,7 @@ def access_secret_version(project_id, secret_id, version_id):
     try:
         response = client.access_secret_version(request={"name": name})
         payload = response.payload.data.decode("UTF-8")
+
         return payload
     except RuntimeError as err:
         logger.error(f"Access to Google Secret Manager created a failure. The Error was {err=}, {type(err)=}")

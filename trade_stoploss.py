@@ -2,6 +2,8 @@ import traceback
 import argparse
 import time
 from decimal import Decimal
+
+from stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
@@ -15,6 +17,7 @@ from stoploss.strategy_stop_loss import (
 from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
+from stoploss.data_classes.global_data import set_google_secret, get_google_secret
 import yaml
 from yaml.loader import SafeLoader
 
@@ -62,6 +65,13 @@ def get_arguments():
         default=1000,
         help="Time in Milliseconds how often the trader should check for a stop loss trigger move"
     )
+    parser.add_argument(
+        "--secret_type",
+        type=str,
+        nargs="?",
+        default="local",
+        help="Select where the secrets are located. Currently supported 'local' and 'google'"
+    )
 
     opt = parser.parse_args()
     return opt
@@ -106,6 +116,16 @@ def init_program():
     arguments = get_arguments()
     # set log level based on arguments
     set_log_level(logger, arguments.log_level)
+
+    # Collect google secrets
+
+    if arguments.secret_type == "google":
+        logger.debug(f"{arguments.secret_type=} . Therefore keys are used from google.")
+        sec_dic = get_key_and_secret_from_google()
+        set_google_secret(sec_dic)
+    elif arguments.secret_type == "local":
+        logger.debug(f"{arguments.secret_type=} . Therefore keys are used from local file.")
+
     return arguments
 
 

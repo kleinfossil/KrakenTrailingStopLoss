@@ -1,4 +1,4 @@
-name: python310_stoploss
+name: python310_stoploss2
 channels:
   - defaults
   - conda-forge

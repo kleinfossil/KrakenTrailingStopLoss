@@ -1,8 +1,8 @@
 import traceback
 
 from stoploss.helper_scripts.helper import get_logger
-from stoploss.helper_scripts.google_secretmanager import access_secret_version
 from test.fake_data.fake_data_user import fake_response_query_data
+from stoploss.data_classes.global_data import get_google_secret
 import urllib.parse
 import hashlib
 import hmac
@@ -24,6 +24,8 @@ def get_secrets(key_type, version):
     # Read Kraken API key and secret for query stored in Google or environment variable (for testing)
 
     try:
+        # The match case was actually developed to manage different secrets per request.
+        # As google just allows 10.000 requests per month I reduced the keys for google to one.
         match key_type:
             case "query":
                 key = "query-key"
@@ -33,14 +35,18 @@ def get_secrets(key_type, version):
                 key = "create-cancel"
             case "modify":
                 key = "modify"
+            case "google":
+                key = "google"
             case _:
                 raise RuntimeError(f"'{key_type}' is not a known key")
 
         google_secrets = int(cfg["kraken_private"]["google"]["google-secrets"])
         if google_secrets == 1:
             logger.debug("Get Query API Keys from Google")
-            kraken_api_key = access_secret_version("250571186544", "KRAKEN_API_KEY", "latest")
-            kraken_private_key = access_secret_version("250571186544", "KRAKEN_API_PRIVATE_KEY", "latest")
+            secret_dict = get_google_secret()
+            kraken_api_key = secret_dict["key"]
+            kraken_private_key = secret_dict["sec"]
+
         elif google_secrets == 0:
             logger.warning("Get Query API Keys from local yaml file. This is for development only. Use Google Secrets for production runs. "
                            "Change trader_config to google-secrets=1")
@@ -74,7 +80,9 @@ def kraken_request(api_url, uri_path, data, api_key, api_sec):
     # get_kraken_signature() as defined in the 'Authentication' section
     headers = {'API-Key': api_key, 'API-Sign': get_kraken_signature(uri_path, data, api_sec)}
 
+
     try:
+        logger.info(f"Preparing URL Private Request: {api_url}{uri_path}")
         req = requests.post((api_url + uri_path), headers=headers, data=data)
     except RuntimeError as err:
         logger.error(f"The Request to Kraken was not successful. "
