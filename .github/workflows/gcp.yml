@@ -40,7 +40,7 @@ jobs:
         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
-    - name: Push Docker Image to Artifact Registry
+    #- name: Push Docker Image to Artifact Registry
       #env:
         #GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
       #run: |-
@@ -48,7 +48,7 @@ jobs:
       #  docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
       #  docker push us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
       #  docker push us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
-    - #name: Restart $INSTANCE_NAME us-central1-actions
+    - name: Restart $INSTANCE_NAME us-central1-actions
       run: |
         # gcloud --quiet compute instances update-container $INSTANCE_NAME --zone us-central1-a --container-image=gcr.io/$PROJECT_I/$IMAGE_NAME
         gcloud compute instances create-with-container $INSTANCE_NAME --project=superb-leaf-308707 --zone us-central1-a --container-image=gcr.io/$PROJECT_I/$IMAGE_NAME --machine-type=e2-micro --provisioning-model=STANDARD --tags=https-server
