@@ -26,7 +26,7 @@ jobs:
     - name: Automatic Tagging of Releases
       id: increment-git-tag
       run: |
-        bash ./scripts/git_update.sh -v patch
+        bash ./git_scripts/git_update.sh -v patch
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
