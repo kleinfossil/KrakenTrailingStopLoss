@@ -3,7 +3,7 @@ basic:
 
 trading:
   supported_currencies: XETHZEUR
-  waiting_time: 10
+  waiting_time: 600
   position:
     base_currency: "XETH"
     quote_currency: "ZEUR"
@@ -14,10 +14,10 @@ trading:
       sell_price_offset: 1
       quote_currency_offset: 30
       config:
-        standard_deviation_interval: "d" # Interval used to calculate the standard deviation. d=days, h=hours, m=minutes
-        standard_deviation_history: 15 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
+        standard_deviation_interval: "w" # Interval used to calculate the standard deviation. d=days, h=hours, m=minutes
+        standard_deviation_history: 10 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
         minmax_interval: "h" # Interval used to find the minimum or maximum value. d=days, h=hours, m=minutes
-        minmax_history: 48 # How much history epochs should be used to find a minmax value.
+        minmax_history: 72 # How much history epochs should be used to find a minmax value.
 
 debugging:
   log-level: "DEBUG"

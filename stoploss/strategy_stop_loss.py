@@ -21,6 +21,8 @@ logger = get_logger("stoploss_logger")
 def get_interval_as_int(interval):
     try:
         match interval:
+            case "w":
+                interval_int = 10080
             case "d":
                 interval_int = 1440
             case "h":

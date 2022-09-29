@@ -20,7 +20,7 @@ def test_get_open_orders():
 
 def test_get_closed_orders():
     #resp = get_closed_orders(key_type="query")
-    resp =  get_closed_trades_for_reporting()
+    resp = get_closed_trades_for_reporting()
     print(resp)
     return resp
 
