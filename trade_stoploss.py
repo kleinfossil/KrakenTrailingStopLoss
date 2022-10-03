@@ -1,3 +1,4 @@
+import sys
 import traceback
 import argparse
 import time
@@ -17,7 +18,8 @@ from stoploss.strategy_stop_loss import (
 from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
-from stoploss.data_classes.global_data import set_google_secret, get_google_secret, reset_google_secret
+from stoploss.data_classes.global_data import set_google_secret, reset_google_secret
+from send_mail import send_mail
 import yaml
 from yaml.loader import SafeLoader
 
@@ -49,7 +51,7 @@ def get_arguments():
         type=str,
         nargs="?",
         default="DEBUG",
-        help="Log level. See: https://docs.python.org/3/library/logging.html#levels"
+        help="Log level for Stream Output. See: https://docs.python.org/3/library/logging.html#levels"
     )
     parser.add_argument(
         "--trading_time",
@@ -210,34 +212,53 @@ def trade_position(base_currency, quote_currency, current_std):
 def post_trade(position):
     # Everything what will happen after a position was traded
     position.add_to_position_book()
+    handlers = logger.handlers
+
+    # save logfile during iteration
+    for handler in handlers:
+        if handler.__class__.__name__ == 'FileHandler':
+            handler.close()
 
 
 if __name__ == "__main__":
-    # Start program
-    trade_arguments = init_program()
-    logger.info("Program ready to trade")
-    base = cfg["trading"]["position"]["base_currency"]
-    quote = cfg["trading"]["position"]["quote_currency"]
+    try:
+        # Start program
+        trade_arguments = init_program()
+        logger.info("Program ready to trade")
+        base = cfg["trading"]["position"]["base_currency"]
+        quote = cfg["trading"]["position"]["quote_currency"]
 
-    # lock finish time
-    time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
-    logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
+        # lock finish time
+        time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
+        logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
 
-    # std_change is a value which should be take over from trade to trade. Therefore it is defined outside the trading loop
-    std_change: Decimal = Decimal(0)
+        # std_change is a value which should be take over from trade to trade. Therefore it is defined outside the trading loop
+        std_change: Decimal = Decimal(0)
 
-    # Start trading
-    while time_till_finish >= time.time():
-        logger.debug(f"Before trading: {std_change=}")
-        traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
-        std_change = traded_position.current_std
-        logger.debug(f"After trading: {std_change=}")
 
-        post_trade(traded_position)
+        # Start trading
 
-        pretty_waiting_time(cfg["trading"]["waiting_time"])
+        while time_till_finish >= time.time():
+            logger.debug(f"Before trading: {std_change=}")
+            traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
+            std_change = traded_position.current_std
+            logger.debug(f"After trading: {std_change=}")
 
-    post_program()
+            post_trade(traded_position)
+
+            pretty_waiting_time(cfg["trading"]["waiting_time"])
+        post_program()
+    except Exception as e:
+        stack = traceback.format_exc()
+        message = f"trade_stoploss.py encountered an error:\n" \
+                  f"Error: {e}\n" \
+                  f"\n" \
+                  f"Stacktrace:\n" \
+                  f"\n" \
+                  f"{stack}"
+        send_mail(message=message)
+
+
 
 
 

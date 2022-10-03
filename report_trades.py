@@ -12,20 +12,26 @@ logger = get_logger("stoploss_logger")
 
 def manage_book(book_name):
     all_trades_book = open_book(book_name)
-    initial_trade_list = transform_order_into_book(get_latest_orders())
-    last_response_txid = initial_trade_list[-1]["txid"]
-    first_response_txid = initial_trade_list[0]["txid"]
-    all_trades_book = append_to_book(name=book_name, book=all_trades_book, book_entries=initial_trade_list)
-    while (last_response_txid != first_response_txid) or (last_response_txid):
+    last_response_txid = ""
+    first_response_txid = "_"
+    last_transaction_not_in_trade_list = True
+    while (last_response_txid != first_response_txid) and last_transaction_not_in_trade_list:
         next_trade_list = transform_order_into_book(get_closed_orders(key_type="query", till=last_response_txid))
-        all_trades_book = append_to_book(name=book_name, book=all_trades_book, book_entries=next_trade_list)
         first_response_txid = next_trade_list[0]["txid"]
         last_response_txid = next_trade_list[-1]["txid"]
-        print(last_response_txid)
-        print(first_response_txid)
+        if not all_trades_book.empty:
+            if last_response_txid in all_trades_book["txid"].values:
+                last_transaction_not_in_trade_list = False
+        all_trades_book = append_to_book(name=book_name, book=all_trades_book, book_entries=next_trade_list)
     save_files(name=book_name, book=all_trades_book)
+    save_files(name="closed_trades", book=create_closed_orders_book(all_trades_book))
 
     return all_trades_book
+
+
+def create_closed_orders_book(df):
+    df.drop(df[df.status != "closed"].index, inplace=True)
+    return df
 
 
 def transform_order_into_book(resp_json):
@@ -102,6 +108,7 @@ def append_to_book(name, book, book_entries):
 
 def save_files(name, book):
     book.drop_duplicates(subset=["txid"], keep="first", inplace=True)
+    book.sort_values(by="close_time_unix", ascending=False, inplace=True)
     book.to_csv(f"{cfg['basic']['book-storage-location']}{name}_book.csv", index=False)
     logger.info(f"Book saved at: {cfg['basic']['book-storage-location']}{name}_book.csv")
     excel_book = pd.read_csv(f"{cfg['basic']['book-storage-location']}{name}_book.csv")
@@ -163,7 +170,7 @@ if __name__ == "__main__":
     #active_book = init_book("all_orders4")
     #get_closed_trades_for_reporting(active_book)
     #get_latest_orders()
-    manage_book("all_orders5")
+    manage_book("all_orders")
 
 
 

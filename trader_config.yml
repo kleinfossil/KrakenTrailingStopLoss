@@ -3,7 +3,7 @@ basic:
 
 trading:
   supported_currencies: XETHZEUR
-  waiting_time: 600
+  waiting_time: 10
   position:
     base_currency: "XETH"
     quote_currency: "ZEUR"
@@ -21,6 +21,7 @@ trading:
 
 debugging:
   log-level: "DEBUG"
+  file_log_level: "WARNING"
   use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values.
   kraken:
     make_trade: 1 # 1 will make a real trade, while 0 will use fake trade data.

@@ -4,8 +4,12 @@ import datetime
 import time
 import logging
 from tqdm import tqdm
-
 from stoploss.helper_scripts.formated_logger import CustomFormatter
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 
 # Take a unix time stamp and return a data and time format
@@ -41,12 +45,20 @@ def get_logger(name="log", log_level="DEBUG"):
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()
+    today = datetime.date.today()
+    d = today.strftime("%Y%m%d")
+    fh = logging.FileHandler(f'logs/{d}_kraken_log.log')
     set_log_level(logger, log_level)
     set_log_level(ch, log_level)
+    set_log_level(fh, cfg["debugging"]["file_log_level"])
 
     ch.setFormatter(CustomFormatter())
+
+    simple_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)")
+    fh.setFormatter(simple_formatter)
     if not logger.handlers:
         logger.addHandler(ch)
+        logger.addHandler(fh)
     return logger
 
 
