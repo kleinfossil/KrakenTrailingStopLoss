@@ -1,14 +1,11 @@
 import traceback
 
-import os
-from datetime import datetime
-from uuid import uuid4
+import datetime
 from stoploss.helper_scripts.helper import get_logger
 
 import pandas as pd
 import yaml
 from yaml.loader import SafeLoader
-
 logger = get_logger("stoploss_logger")
 
 with open("trader_config.yml", "r") as yml_file:
@@ -22,7 +19,7 @@ def add_trade(trade_dict):
 
 
 def append_to_book(name, book, book_entries):
-    if name == "closed_trades":
+    if name == "all_orders":
         append_df = pd.DataFrame(book_entries)
         book = pd.concat([book, append_df])
     else:

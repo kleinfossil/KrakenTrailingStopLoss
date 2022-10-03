@@ -82,7 +82,7 @@ def kraken_request(api_url, uri_path, data, api_key, api_sec):
 
 
     try:
-        logger.info(f"Preparing URL Private Request: {api_url}{uri_path}")
+        logger.info(f"Preparing URL Private Request: {api_url}{uri_path}{data}")
         req = requests.post((api_url + uri_path), headers=headers, data=data)
     except RuntimeError as err:
         logger.error(f"The Request to Kraken was not successful. "
@@ -116,14 +116,21 @@ def get_open_orders(key_type):
     return resp.json()
 
 
-def get_closed_orders(key_type):
+def get_closed_orders(key_type, till=""):
     endpoint = "ClosedOrders"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
-    resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
-        "nonce": str(int(1000 * time.time())),
-        "trades": True
-    }, api_key, api_sec)
+    if till != "":
+        resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+            "nonce": str(int(1000 * time.time())),
+            "trades": True,
+            "end": till
+        }, api_key, api_sec)
+    else:
+        resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
+            "nonce": str(int(1000 * time.time())),
+            "trades": True,
+        }, api_key, api_sec)
     logger.debug(f"Closed Orders received from Kraken. Orders: {str(resp.json())}")
     return resp.json()
 

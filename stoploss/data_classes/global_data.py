@@ -12,3 +12,9 @@ def get_google_secret():
     return secret_dict
 
 
+def reset_google_secret():
+    keyring.delete_password("google", "key")
+    keyring.delete_password("google", "sec")
+
+
+

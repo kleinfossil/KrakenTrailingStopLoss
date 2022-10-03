@@ -17,7 +17,7 @@ from stoploss.strategy_stop_loss import (
 from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
-from stoploss.data_classes.global_data import set_google_secret, get_google_secret
+from stoploss.data_classes.global_data import set_google_secret, get_google_secret, reset_google_secret
 import yaml
 from yaml.loader import SafeLoader
 
@@ -129,6 +129,10 @@ def init_program():
     return arguments
 
 
+def post_program():
+    reset_google_secret()
+
+
 def init_trader():
     # create position
     position = create_position(base_currency=cfg["trading"]["position"]["base_currency"], quote_currency=cfg["trading"]["position"]["quote_currency"])
@@ -232,6 +236,8 @@ if __name__ == "__main__":
         post_trade(traded_position)
 
         pretty_waiting_time(cfg["trading"]["waiting_time"])
+
+    post_program()
 
 
 
