@@ -2,3 +2,4 @@
 api_key_development.yml
 /logs/*
 mail_info.yml
+/key_files/*

@@ -6,7 +6,11 @@ from email.mime.text import MIMEText
 import yaml
 from yaml.loader import SafeLoader
 
-with open("mail_info.yml", "r") as yml_file:
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
+
+mail_info_path = cfg["basic"]["mail_key_file_location"]
+with open(mail_info_path, "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 

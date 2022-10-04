@@ -220,6 +220,25 @@ def post_trade(position):
             handler.close()
 
 
+def exception_handling(e):
+    # Send failure Message
+    stack = traceback.format_exc()
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    message = f"trade_stoploss.py encountered an error:\n" \
+              f"Error: {e}\n" \
+              f"\n" \
+              f"Stacktrace:\n" \
+              f"\n" \
+              f"{stack}"
+    # send_mail(message=message)
+
+    # Log error
+    logger.error(f"{traceback.format_tb(exc_traceback)} {e}")
+    handlers = logger.handlers
+    for handler in handlers:
+        if handler.__class__.__name__ == 'FileHandler':
+            handler.close()
+
 if __name__ == "__main__":
     try:
         # Start program
@@ -248,15 +267,20 @@ if __name__ == "__main__":
 
             pretty_waiting_time(cfg["trading"]["waiting_time"])
         post_program()
+    except RuntimeError as e:
+        exception_handling(e)
+        exit(0)
+    except TypeError as e:
+        exception_handling(e)
+        exit(0)
+    except AttributeError as e:
+        exception_handling(e)
+        exit(0)
     except Exception as e:
-        stack = traceback.format_exc()
-        message = f"trade_stoploss.py encountered an error:\n" \
-                  f"Error: {e}\n" \
-                  f"\n" \
-                  f"Stacktrace:\n" \
-                  f"\n" \
-                  f"{stack}"
-        send_mail(message=message)
+        exception_handling(e)
+        exit(0)
+
+
 
 
 
