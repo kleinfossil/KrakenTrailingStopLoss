@@ -3,6 +3,7 @@ import traceback
 import argparse
 import time
 from decimal import Decimal
+from datetime import datetime, timedelta
 
 from stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 from stoploss.helper_scripts.helper import (
@@ -230,7 +231,10 @@ def exception_handling(e):
               f"Stacktrace:\n" \
               f"\n" \
               f"{stack}"
-    # send_mail(message=message)
+    if cfg["debugging"]["send_error_mails"] == 1:
+        send_mail(message=message)
+    else:
+        logger.info("Send Error Mails is currently deactivated")
 
     # Log error
     logger.error(f"{traceback.format_tb(exc_traceback)} {e}")
@@ -264,8 +268,14 @@ if __name__ == "__main__":
             logger.debug(f"After trading: {std_change=}")
 
             post_trade(traded_position)
-
-            pretty_waiting_time(cfg["trading"]["waiting_time"])
+            now = datetime.now()
+            next_execution = now + timedelta(seconds=cfg["trading"]["waiting_time"])
+            print(f"It is now: {now} -> Wait {cfg['trading']['waiting_time']} Seconds -> Next Execution: {next_execution}")
+            if cfg["basic"]["pretty_waiting_time"] == 1:
+                pretty_waiting_time(cfg["trading"]["waiting_time"])
+            else:
+                logger.debug("Pretty Waiting Time is deactivated.")
+                time.sleep(cfg["trading"]["waiting_time"])
         post_program()
     except RuntimeError as e:
         exception_handling(e)

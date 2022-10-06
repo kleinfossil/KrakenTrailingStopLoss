@@ -2,6 +2,7 @@ basic:
   book-storage-location: "books/"
   mail_key_file_location: "key_files/mail_info.yml"
   logs-location: "logs/"
+  pretty_waiting_time: 0 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
 
 trading:
   supported_currencies: "XETHZEUR"
@@ -24,6 +25,7 @@ trading:
 debugging:
   log-level: "DEBUG" # Log Level must be equal or lower than file file_log_level.
   file_log_level: "WARNING"
+  send_error_mails: 0 # Setting it to 1 will send error mails based on the mail_info.yml configuration
   use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values.
   kraken:
     make_trade: 1 # 1 will make a real trade, while 0 will use fake trade data.
