@@ -3,6 +3,8 @@ import math
 import datetime
 import time
 import logging
+import traceback
+
 from tqdm import tqdm
 from stoploss.helper_scripts.formated_logger import CustomFormatter
 import yaml
@@ -47,7 +49,13 @@ def get_logger(name="log", log_level="DEBUG"):
     ch = logging.StreamHandler()
     today = datetime.date.today()
     d = today.strftime("%Y%m%d")
-    fh = logging.FileHandler(f'logs/{d}_kraken_log.log')
+    try:
+        from pathlib import Path
+        Path(cfg['basic']['logs-location']).mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        logger.error(f"{traceback.print_stack()} {e} \n Could not create path for logs. Check configuration")
+        exit(1)
+    fh = logging.FileHandler(f'{cfg["basic"]["logs-location"]}{d}_kraken_log.log')
     set_log_level(logger, log_level)
     set_log_level(ch, log_level)
     set_log_level(fh, cfg["debugging"]["file_log_level"])

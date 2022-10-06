@@ -57,6 +57,12 @@ def init_book(name):
 def open_book(name):
     # Create Book
     try:
+        try:
+            from pathlib import Path
+            Path(cfg['basic']['book-storage-location']).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            logger.error(f"{traceback.print_stack()} {e} \n Could not create path for books. Check configuration")
+            exit(1)
         db_path = cfg['basic']['book-storage-location'] + name + "_book.csv"
         logger.debug(f"Opening book at {db_path}")
         book = pd.read_csv(db_path)

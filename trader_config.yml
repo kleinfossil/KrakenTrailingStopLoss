@@ -1,6 +1,7 @@
 basic:
   book-storage-location: "books/"
   mail_key_file_location: "key_files/mail_info.yml"
+  logs-location: "logs/"
 
 trading:
   supported_currencies: "XETHZEUR"

@@ -45,6 +45,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\books\all_orders_book.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\books\closed_trades_book.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
