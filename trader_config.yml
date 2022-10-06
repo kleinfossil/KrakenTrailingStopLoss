@@ -2,7 +2,7 @@ basic:
   book-storage-location: "books/"
   mail_key_file_location: "key_files/mail_info.yml"
   logs-location: "logs/"
-  pretty_waiting_time: 0 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
+  pretty_waiting_time: 1 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
 
 trading:
   supported_currencies: "XETHZEUR"
