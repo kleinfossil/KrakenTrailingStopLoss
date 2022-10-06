@@ -203,6 +203,26 @@ def trade_add_order(trade_dict, key_type):
     return resp.json(), trade_execution_check
 
 
+def did_order_change(trade_dict):
+    open_order = get_open_orders("query")
+    print(open_order)
+    print(trade_dict)
+    changed_dict = {}
+    changed_dict["changed"] = True
+    if open_order["result"]["open"][trade_dict["txid"]]["status"] == "open":
+        if (trade_dict["pair"] == "XETHZEUR") and (open_order["result"]["open"][trade_dict["txid"]]["descr"]["pair"] == "ETHEUR"):
+            if trade_dict["type"] == open_order["result"]["open"][trade_dict["txid"]]["descr"]["type"]:
+                if trade_dict["price"] == open_order["result"]["open"][trade_dict["txid"]]["descr"]["price"]:
+                    if trade_dict["price2"] == open_order["result"]["open"][trade_dict["txid"]]["descr"]["price2"]:
+                        if trade_dict["volume"] == open_order["result"]["open"][trade_dict["txid"]]["vol"]:
+                            changed_dict["changed"] = False
+
+    changed_dict['current'] = open_order
+    changed_dict['new'] = trade_dict
+
+    return changed_dict
+
+
 def trade_edit_order(trade_dict, key_type):
     endpoint = "EditOrder"
     version = cfg["kraken_private"]["development_keys"]["key_version"]
@@ -213,13 +233,20 @@ def trade_edit_order(trade_dict, key_type):
         resp = ""
     elif kill_switch == "trade":
         logger.debug(f"Make request to kraken with following Data: {trade_dict}")
-        resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
+        changed_dict = did_order_change(trade_dict)
+        if changed_dict["changed"]:
+            resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
+        else:
+            logger.info(f"Order is the same as an existing on Kraken. Order not send to Kraken\n"
+                        f"Current Order: {changed_dict['current']}\n"
+                        f"New Order: {changed_dict['new']}")
+            resp = ""
     else:
         raise RuntimeError(f"{kill_switch=} is not set correctly")
     trade_execution_check = True
     if resp == "":
-        logger.debug(f"Kill Switch Active")
-        return resp , trade_execution_check
+        logger.debug(f"Kill Switch Active or Order didn't change")
+        return resp, trade_execution_check
     else:
         logger.debug(f"Edit Trade send to Kraken. Response was: \n"
                      f"{resp}\n"
