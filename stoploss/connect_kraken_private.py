@@ -209,6 +209,11 @@ def did_order_change(trade_dict):
     print(trade_dict)
     changed_dict = {}
     changed_dict["changed"] = True
+    try:
+        active_transaction = open_order["result"]["open"][trade_dict["txid"]]
+    except KeyError:
+        logger.error(traceback.print_stack(), f"{trade_dict['txid']} Transaction ID does not exists on Kraken. There is no Order which can be edited.")
+        exit(1)
     if open_order["result"]["open"][trade_dict["txid"]]["status"] == "open":
         if (trade_dict["pair"] == "XETHZEUR") and (open_order["result"]["open"][trade_dict["txid"]]["descr"]["pair"] == "ETHEUR"):
             if trade_dict["type"] == open_order["result"]["open"][trade_dict["txid"]]["descr"]["type"]:
