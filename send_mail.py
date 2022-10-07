@@ -1,7 +1,12 @@
 import smtplib
 import ssl
+import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from stoploss.helper_scripts.helper import (
+    get_logger)
+
+logger = get_logger("stoploss_logger")
 
 import yaml
 from yaml.loader import SafeLoader
@@ -14,7 +19,7 @@ with open(mail_info_path, "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 
-def send_mail(message):
+def send_error_mail(message):
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = cfg["sender_mail"]  # Enter your address
@@ -34,3 +39,6 @@ def send_mail(message):
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, final_message.as_string())
+    sleep_time = 600
+    logger.info(f"Error Mail was send. To avoid unnecessary load on the SMTP server in case of a loop failing the system will sleep for {sleep_time} seconds.")
+    time.sleep(sleep_time)
