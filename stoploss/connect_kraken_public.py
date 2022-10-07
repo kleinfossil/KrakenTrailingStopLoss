@@ -14,16 +14,16 @@ api_path = "/0/public/"
 def make_public_data_request(api_request, request_try=3):
     logger.info(f"Preparing URL Public Request: {api_request}")
     request_finished = False
-    request_attempts = 0
+    request_attempts = 1
     try:
-        while not request_finished:
+        while (not request_finished) and (request_attempts <= request_try):
             try:
                 resp = requests.get(api_request)
                 request_attempts += 1
-                if resp.status_code == 200 and request_attempts < request_try:
+                if resp.status_code == 200:
                     request_finished = True
                     return resp
-                time.sleep(3)
+                time.sleep(10)
             except Exception as e:
                 logger.error(f"{traceback.print_stack()} {e}")
         raise RuntimeError(f"The following public API Request could not be executed : {api_request}")
