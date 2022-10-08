@@ -14,7 +14,7 @@ from stoploss.helper_scripts.helper import (
     convert_datetime_to_unix_time,
     pretty_waiting_time)
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
-from stoploss.data_classes.Position import Position
+from stoploss.data_classes.Position import Position, Order
 from stoploss.strategy_stop_loss_helper import (
     get_buy_or_sell_type,
     get_limit_price_and_volume)
@@ -127,6 +127,7 @@ def init_program():
 
 
 def post_program():
+    # Will be used in future for post processing at the point cronjobs are implemented
     reset_google_secret()
 
 
@@ -159,6 +160,8 @@ def select_order_in_scope(orders_in_scope, base_currency, quote_currency, pair):
 
 
 def trade_position(base_currency, quote_currency, current_std):
+    # Main function which trades the position of a trader
+
     try:
         active_position = create_position(base_currency, quote_currency, current_std)
         if cfg["trading"]["strategy"]["stop_loss"]["active"] == 1:
@@ -237,6 +240,7 @@ def exception_handling(e):
         if handler.__class__.__name__ == 'FileHandler':
             handler.close()
 
+
 if __name__ == "__main__":
     try:
         # Start program
@@ -252,9 +256,7 @@ if __name__ == "__main__":
         # std_change is a value which should be take over from trade to trade. Therefore it is defined outside the trading loop
         std_change: Decimal = Decimal(0)
 
-
         # Start trading
-
         while time_till_finish >= time.time():
             logger.debug(f"Before trading: {std_change=}")
             traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)

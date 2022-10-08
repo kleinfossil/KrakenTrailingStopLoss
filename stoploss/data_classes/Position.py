@@ -61,3 +61,14 @@ class Position:
         append_to_book(book_name, positions_book, pos_dict)
 
 
+@dataclass
+class Order:
+    txid: str
+    base_currency: str  # Currency code for trading. E.g. ETH
+    quote_currency: str  # Currency which is used for valuing the base currency. E.g. EUR
+    exchange_currency_pair: str
+    price: Decimal
+    price2: Decimal
+    volume_base: Decimal
+    volume_quote: Decimal
+
