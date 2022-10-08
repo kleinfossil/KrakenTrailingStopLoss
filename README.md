@@ -34,6 +34,9 @@ All Configuration is set up in trader_config.yml
 
 After the setup, the program can be started by simply executing "python main.py" which already has all arguments correctly filled. Or you can start the trade_stoploss.py and include the required arguments. 
 ### Run the reporting Tool
+The report Tool will collect all trades and create an excel sheet of all trades and closed trades. 
+
+Execute "python report_trades.py"
 
 
 
