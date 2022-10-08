@@ -1,0 +1,5 @@
+# Add the email address you want to use. It is recommended to create an email account just for sending automated emails.
+# The sender password is in case of gmail a google generated app password. More details here: https://support.google.com/accounts/answer/185833?hl=en
+sender_mail: YOUR EMAIL ADDRESS
+sender_password: EMAIL PASSWORD
+receiver_mail: EMAIL WHO SHOULD RECEIVE THE MAILS

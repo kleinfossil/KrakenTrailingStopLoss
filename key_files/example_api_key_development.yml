@@ -1,0 +1,23 @@
+# You need to update this file with your keys and change the name to api_key_development.yml
+# It is recommended to use different keys for different tasks.
+kraken-key:
+  query-key:
+    220922:
+      name: api_query
+      key:
+      sec:
+  create-cancel:
+    220922:
+      name: api_create_and_modify
+      key:
+      sec:
+  modify:
+    220922:
+      name: api_cancel
+      key:
+      sec:
+  google-api:
+    220929:
+      name: google-api
+      key:
+      sec:
