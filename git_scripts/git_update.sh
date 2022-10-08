@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script was designed to automatically trigger git actions on github.
+# I creates a new version every time it is executed.
+
 VERSION=""
 
 # get parameters

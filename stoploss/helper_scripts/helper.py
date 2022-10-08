@@ -14,34 +14,35 @@ with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 
-# Take a unix time stamp and return a data and time format
 def convert_unix_time_to_datetime(unix_time):
+    # Take a unix time stamp and return a data and time format
     date_and_time = datetime.datetime.fromtimestamp(unix_time)
     return str(date_and_time)
 
 
 def convert_datetime_to_unix_time(date_time):
+    # Converts datetime to a unix time stamp
     d = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S%z')
     unix_time = time.mktime(d.timetuple())
     return unix_time
 
 
-# Calculate variance based on a list of data
 def get_variance(data, degree_of_freedom=0):
+    # Calculate variance based on a list of data
     n = len(data)
     mean = sum(data) / n
     return sum((x - mean) ** 2 for x in data) / (n - degree_of_freedom)
 
 
-# Calculate standard deviation based on a list of data
 def get_stdev(data):
+    # Calculate standard deviation based on a list of data
     var = get_variance(data)
     std_dev = math.sqrt(var)
     return std_dev
 
 
-# Creates a colorful logger
 def get_logger(name="log", log_level="DEBUG"):
+    # Creates a colorful logger
 
     logger = logging.getLogger(name)
 
@@ -71,6 +72,7 @@ def get_logger(name="log", log_level="DEBUG"):
 
 
 def set_log_level(logger, log_level):
+    # Ensures that the log level provided is one of the log levels supported
     match log_level.upper():
         case "NOTSET":
             logger.setLevel(logging.NOTSET)
@@ -88,5 +90,6 @@ def set_log_level(logger, log_level):
 
 
 def pretty_waiting_time(waiting_time):
+    # Creates a pretty waiting time. This can be sometimes messed up and create errors. Therefore you can deactivate it in the trader_config.yml
     for i in tqdm(range(1, waiting_time)):
         time.sleep(1)

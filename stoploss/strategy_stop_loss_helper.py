@@ -1,14 +1,10 @@
+# Additional Helper Scripts not directly related to the stop loss trigger calculation
+
 import traceback
-import time
 from decimal import Decimal
-
 from stoploss.collect_data_user import get_account_balance_per_currency
-from stoploss.data_classes.StopLoss_Trigger import StopLoss_Trigger
-
 from stoploss.helper_scripts.helper import (
-    get_logger,
-    convert_unix_time_to_datetime)
-
+    get_logger)
 import yaml
 from yaml.loader import SafeLoader
 
@@ -19,6 +15,7 @@ logger = get_logger("stoploss_logger")
 
 
 def get_interval_as_int(interval):
+    # Transforms the intervals provided into integer numbers.
     try:
         match interval:
             case "w":
@@ -37,6 +34,9 @@ def get_interval_as_int(interval):
 
 
 def get_buy_or_sell_type(position):
+    # Returns an information of a traders position is buy or sell
+    # This is a hardcoded method which could be refined in future.
+
     if position.current_volume_of_base_currency == 0:
         logger.debug("Base Currency is equal 0. Therefore execute BUY trade.")
         buy_sell = "buy"
@@ -49,6 +49,8 @@ def get_buy_or_sell_type(position):
 
 
 def get_limit_price_and_volume(position, buy_sell_type):
+    # It finds a limit price based on the offset setup in the config.
+
     trade_dict = {"volume": 0, "price": 0}
     account_balance = get_account_balance_per_currency(position.exchange_currency_pair)
     if buy_sell_type == "sell":
@@ -67,6 +69,8 @@ def get_limit_price_and_volume(position, buy_sell_type):
 
 
 def get_stop_trigger(position):
+    # Just returns the stop loss trigger
+
     return position.trigger
 
 

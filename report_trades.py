@@ -1,3 +1,5 @@
+# This script reports trades and creates a report of all and all closed trades
+
 from stoploss.connect_kraken_private import get_closed_orders
 from stoploss.helper_scripts.helper import get_logger, convert_unix_time_to_datetime
 import pandas as pd
@@ -11,10 +13,19 @@ logger = get_logger("stoploss_logger")
 
 
 def manage_book(book_name):
+    # Initiates a reporting book
+
     all_trades_book = open_book(book_name)
     last_response_txid = ""
     first_response_txid = "_"
     last_transaction_not_in_trade_list = True
+
+    # This will collect all transactions as Kraken just returns a limit number.
+    # Confusing is how Kraken works with start and end date (probably because the API was written for a user interface).
+    # Kraken uses the End Date to provided data starting from this data and earlier. So it is End-Date --> everything earlier End-Date
+    # Start Date provides everything until the End Date. So it is like Start Date --> Data --> End Date.
+    # Means a start date with 01.10.2022 and End Date 05.10.2022 would provide all data between these dates.
+    # If I want to get all the data I start with today and then move the End date back to the latest entry while start date is not used.
     while (last_response_txid != first_response_txid) and last_transaction_not_in_trade_list:
         next_trade_list = transform_order_into_book(get_closed_orders(key_type="query", till=last_response_txid))
         first_response_txid = next_trade_list[0]["txid"]
@@ -22,7 +33,7 @@ def manage_book(book_name):
         if not all_trades_book.empty:
             if last_response_txid in all_trades_book["txid"].values:
                 last_transaction_not_in_trade_list = False
-        all_trades_book = append_to_book(name=book_name, book=all_trades_book, book_entries=next_trade_list)
+        all_trades_book = append_to_book(book=all_trades_book, book_entries=next_trade_list)
     save_files(name=book_name, book=all_trades_book)
     save_files(name="closed_trades", book=create_closed_orders_book(all_trades_book))
 
@@ -30,11 +41,15 @@ def manage_book(book_name):
 
 
 def create_closed_orders_book(df):
+    # Takes a book with all orders and drops everything which is not marked with status "closed"
+
     df.drop(df[df.status != "closed"].index, inplace=True)
     return df
 
 
 def transform_order_into_book(resp_json):
+    # Just formats the information from Kraken to a nice report
+
     orders = resp_json["result"]["closed"]
     all_txids = []
     for order in orders:
@@ -74,7 +89,7 @@ def transform_order_into_book(resp_json):
 
 
 def open_book(name):
-    # Create Book
+    # Creates a csv file to save the data
     try:
         db_path = cfg['basic']['book-storage-location'] + name + "_book.csv"
         logger.debug(f"Opening book at {db_path}")
@@ -93,20 +108,25 @@ def open_book(name):
 
 
 def init_book(name):
+    # loads an existing book
+
     df = pd.DataFrame()
     df.to_csv(f"{cfg['basic']['book-storage-location']}{name}_book.csv", index=False)
     return df
 
 
-def append_to_book(name, book, book_entries):
+def append_to_book(book, book_entries):
+    # Appends new entries to a book
+
     append_df = pd.DataFrame(book_entries)
     book = pd.concat([book, append_df])
-
 
     return book
 
 
 def save_files(name, book):
+    # Saves all details to a book
+
     book.drop_duplicates(subset=["txid"], keep="first", inplace=True)
     book.sort_values(by="close_time_unix", ascending=False, inplace=True)
     book.to_csv(f"{cfg['basic']['book-storage-location']}{name}_book.csv", index=False)
@@ -117,11 +137,15 @@ def save_files(name, book):
 
 
 def get_latest_orders():
+    # Gets latest orders
+
     resp_json = get_closed_orders(key_type="query")
     return resp_json
 
 
 def get_closed_trades_for_reporting(book, till="OLHFIA-WPUQN-XZ4PF6"):
+    # Collects all trades from Kraken.
+
     resp_json = get_closed_orders(key_type="query", till=till)
     orders = resp_json["result"]["closed"]
     closed_txids = []
@@ -162,14 +186,11 @@ def get_closed_trades_for_reporting(book, till="OLHFIA-WPUQN-XZ4PF6"):
 
         dict_list.append(trade_details)
 
-    book_name = "all_orders"
-    append_to_book(book_name, book, dict_list)
+    append_to_book(book, dict_list)
 
 
 if __name__ == "__main__":
-    #active_book = init_book("all_orders4")
-    #get_closed_trades_for_reporting(active_book)
-    #get_latest_orders()
+    # This makes it executable
     manage_book("all_orders")
 
 

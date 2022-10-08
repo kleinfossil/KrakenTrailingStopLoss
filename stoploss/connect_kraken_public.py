@@ -1,4 +1,4 @@
-# Script functions who connect to kraken
+# Script functions who connect to kraken public data (no secret required)
 import traceback
 import requests
 import time
@@ -12,6 +12,8 @@ api_path = "/0/public/"
 
 
 def make_public_data_request(api_request, request_try=3):
+    # Creates a public data request. Sometimes the data is not provided immediately. In this case it tries 3 times.
+
     logger.info(f"Preparing URL Public Request: {api_request}")
     request_finished = False
     request_attempts = 1
@@ -32,6 +34,8 @@ def make_public_data_request(api_request, request_try=3):
 
 
 def check_response_for_errors(json_response, api_request):
+    # Checks if the Kraken response (the content) had any error
+
     try:
         if len(json_response["error"]) != 0:
             raise RuntimeError(f"Api Request could be excuted {api_request}, but had an Error: {json_response['error']}\n"
@@ -43,8 +47,8 @@ def check_response_for_errors(json_response, api_request):
         logger.error(f"{traceback.print_stack()} {e}")
 
 
-# Provides Open, High, Low, Close Data. See: https://docs.kraken.com/rest/#operation/getOHLCData
 def get_ohlc_json(pair, interval=1, since=0):
+    # Provides Open, High, Low, Close Data. See: https://docs.kraken.com/rest/#operation/getOHLCData
     api_symbol = pair.upper()
     endpoint = "OHLC"
 
@@ -59,6 +63,7 @@ def get_ohlc_json(pair, interval=1, since=0):
 
 
 def get_ticker(pair):
+    # Gets the latest ticket
     api_symbol = pair.upper()
     endpoint = "Ticker"
 
@@ -72,6 +77,7 @@ def get_ticker(pair):
 
 
 def get_asset_pairs(pair):
+    # Gets Kraken asset Pairs
     api_symbol = pair.upper()
     endpoint = "AssetPairs"
 

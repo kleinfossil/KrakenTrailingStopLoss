@@ -1,3 +1,5 @@
+# This script implements the Stop Loss trading.
+
 import sys
 import traceback
 import argparse
@@ -12,8 +14,8 @@ from stoploss.helper_scripts.helper import (
     convert_datetime_to_unix_time,
     pretty_waiting_time)
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
-from stoploss.data_classes.Position import Position, Order
-from stoploss.strategy_stop_loss import (
+from stoploss.data_classes.Position import Position
+from stoploss.strategy_stop_loss_helper import (
     get_buy_or_sell_type,
     get_limit_price_and_volume)
 from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
@@ -31,22 +33,9 @@ logger = get_logger("stoploss_logger")
 
 
 def get_arguments():
+    # Parses all arguments
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "--std_history",
-        type=int,
-        nargs="?",
-        default=15,
-        help="Number of values which should be used for the standard deviation"
-    )
-    parser.add_argument(
-        "--minmax_history",
-        type=int,
-        nargs="?",
-        default=24,
-        help="Number values which should be used to identify minimum and maximum"
-    )
     parser.add_argument(
         "--log_level",
         type=str,
@@ -81,6 +70,8 @@ def get_arguments():
 
 
 def get_currency_pair(base_currency, quote_currency):
+    # Currently this tool just supports Ether and Euro.
+    # This function should be changed at the time more currencies are implemented
     try:
         if (base_currency == "XETH") and (quote_currency == "ZEUR"):
             exchange_currency_pair = "XETHZEUR"
@@ -92,6 +83,8 @@ def get_currency_pair(base_currency, quote_currency):
 
 
 def create_position(base_currency, quote_currency, current_std):
+    # A Position is a dataclass which holds important information like the currency pairs and balances.
+    # This function creates the position
     try:
         exchange_currency_pair = get_currency_pair(base_currency=base_currency, quote_currency=quote_currency)
         if cfg["debugging"]["use-fake-user-balance"] == 1:
@@ -117,11 +110,12 @@ def create_position(base_currency, quote_currency, current_std):
 def init_program():
     # Resolve provided arguments
     arguments = get_arguments()
-    # set log level based on arguments
+    # Set log level based on arguments
     set_log_level(logger, arguments.log_level)
 
-    # Collect google secrets
-
+    # This program was planned with google secrets in mind.
+    # Due to the complexity to make the program portable (and therefore runnable on google cloud) this was not yet fully implemented.
+    # The program currently works only with local keys provided in the key files folder.
     if arguments.secret_type == "google":
         logger.debug(f"{arguments.secret_type=} . Therefore keys are used from google.")
         sec_dic = get_key_and_secret_from_google()

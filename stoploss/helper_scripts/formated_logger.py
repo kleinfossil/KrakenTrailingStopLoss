@@ -1,3 +1,4 @@
+# Creates a pretty logger
 import logging
 
 

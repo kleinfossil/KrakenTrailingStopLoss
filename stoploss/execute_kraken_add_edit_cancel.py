@@ -1,6 +1,8 @@
+# Manages the Orders of the Traders. This script can be seen as the Orchestrator for every Kraken Order
+
 from stoploss.helper_scripts.helper import get_logger
 from stoploss.connect_kraken_private import get_secrets, trade_add_order, trade_edit_order
-from stoploss.checks_kraken import check_order
+from stoploss.checks_trade import check_order
 from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
 from yaml.loader import SafeLoader
@@ -18,6 +20,9 @@ def execute_order(trade_variable):
     make_trade = int(cfg["debugging"]["kraken"]["make_trade"])
     use_real_data = int(cfg["debugging"]["kraken"]["use_real_trading_data"])
     resp = {}
+
+    # The following checks if a trade should be made. All the decisions are mainly just there as during the create the development process was not trusted.
+    # Going forward this method can be reduced and decisions can be taken away.
     if make_trade == 1:
         if use_real_data == 1:
             if check_order(trade_variable):
@@ -37,6 +42,10 @@ def execute_order(trade_variable):
                 logger.exception("Not enough Funds available. Trade not executed")
                 trade_execution_check = False
                 resp = ""
+
+        # This part exists for testing purposes and can be refactored in future.
+        # It just exists as it was not always clear which data would arrive in the execute_order function.
+        # Therefore this allowed to ensure specific data to be used for the trade.
         elif use_real_data == 0:
             logger.warning("Make a Example Trade! Change main_config 'UseRealData' to 1 for real data")
             logger.warning("Overwriting trade_variables with example data")
@@ -64,6 +73,7 @@ def execute_order(trade_variable):
                              f"Use 1 for real data and 0 for example data")
             trade_execution_check = False
             resp = ""
+    # The program allows to create example trades. This is mainly for the case it should be tested and no internet is available.
     else:
         # Construct the request and return the result
         api_url = "https://api.kraken.com"
@@ -78,6 +88,9 @@ def execute_order(trade_variable):
 
 
 def ask_for_order_execution(trade, make_trade, use_real_data):
+    # This function allows to ask every time an order need to be executed.
+    # It can be configured in the trader_config.yml
+
     trade_approval = int(cfg["kraken_trade"]["trade_requires_approval"])
     if trade_approval == 1:
         # Check for user approval before placing the trade in Kraken

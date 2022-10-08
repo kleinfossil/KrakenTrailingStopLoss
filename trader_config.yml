@@ -32,7 +32,7 @@ debugging:
     use_real_trading_data: 1 # 1 will use data as provided to the trade. 0 will overwrite this data with predefined fake data.
     make_real_query: 1 # 1 will make a real query. 0 will respond with fake data.
     kill_switch: "trade" # switch setup before every add trade, modify trade and cancel trade kraken call. If 'do_not_trade' then no request to kraken will be made. If 'trade' requests to kraken will be made.
-    kraken_validation: 1 # If 0 the "validate" parameter of the kraken API will be set to "true". Means no trade will be made and kraken will just validate the transaction. If set to 1 it will make a real trade.
+    kraken_validation: 0 # If 0 the "validate" parameter of the kraken API will be set to "true". Means no trade will be made and kraken will just validate the transaction. If set to 1 it will make a real trade.
 
 kraken_private:
   google:

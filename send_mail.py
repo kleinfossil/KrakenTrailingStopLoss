@@ -1,3 +1,5 @@
+# Sends out emails in case of an error
+
 import smtplib
 import ssl
 import time
@@ -5,11 +7,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from stoploss.helper_scripts.helper import (
     get_logger)
-
-logger = get_logger("stoploss_logger")
-
 import yaml
 from yaml.loader import SafeLoader
+
+logger = get_logger("stoploss_logger")
 
 with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)

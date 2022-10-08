@@ -1,3 +1,4 @@
+# Currently the environment.yml is not tested.
 name: python310_stoploss2
 channels:
   - defaults

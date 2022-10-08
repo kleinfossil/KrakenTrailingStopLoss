@@ -1,6 +1,6 @@
+# This script manages the creation of CSV and excel reports (called books). Which allows to keep track what the program does
 import traceback
 
-import datetime
 from stoploss.helper_scripts.helper import get_logger
 
 import pandas as pd
@@ -12,13 +12,8 @@ with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 
-def add_trade(trade_dict):
-    book_name = "trade"
-    trade_book = open_book(book_name)
-    append_to_book(book_name, trade_book, trade_dict)
-
-
 def append_to_book(name, book, book_entries):
+    # Adds a new value to a book
     if name == "all_orders":
         append_df = pd.DataFrame(book_entries)
         book = pd.concat([book, append_df])
@@ -39,6 +34,7 @@ def append_to_book(name, book, book_entries):
 
 
 def init_book(name):
+    # Initiates books
     try:
         match name:
             case "positions":
@@ -55,7 +51,7 @@ def init_book(name):
 
 
 def open_book(name):
-    # Create Book
+    # Opens books
     try:
         try:
             from pathlib import Path

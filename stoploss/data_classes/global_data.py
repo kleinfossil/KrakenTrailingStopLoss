@@ -1,3 +1,5 @@
+# This script contains functions which can be used globally for every script
+# Currently it just implements the secret management
 import keyring
 
 

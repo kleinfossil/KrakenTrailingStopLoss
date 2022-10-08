@@ -1,4 +1,5 @@
-from stoploss.data_classes.Position import Position
+# This script prepares the trading date so that it can be handed over to a market like kraken.
+
 from decimal import Decimal
 from stoploss.data_classes.kraken_data_classes import AddTrade, EditOrder
 from stoploss.execute_kraken_add_edit_cancel import execute_order
@@ -71,18 +72,22 @@ def edit_order(position, txid, buy_sell_type, volume, price, price2, trade_reaso
     format_trading_message(message_type="outro", position=position)
 
 
-
-
 def format_trading_message(message_type, position, trade_message="Trade", trade_reason_message="", buy_sell_type="", volume: Decimal = 0, price: Decimal = 0.0, price2: Decimal = 0.0):
+    # Output show on the screen during trading
+
     if message_type == "intro":
         print(f"--------> {trade_message}------->")
         print(f"Trade Reason: {trade_reason_message}")
         print("")
         print(f"Assets before Trade:")
-        print(position)
+        position.print_position()
         print("")
-        print(f"Order: {buy_sell_type} - {position.exchange_currency_pair} - Volume: {volume} - Trigger: {price} - Limit Price: {price2} - Order Value: {volume * price}")
-        print("")
+        print("###")
+        print(f"Order: {buy_sell_type} - {position.exchange_currency_pair}\n"
+              f"Volume: {volume}\n"
+              f"Trigger: {price} - Limit Price: {price2}\n"
+              f"Order Value: {volume * price}")
+        print("###")
     elif message_type == "outro":
         print("<----------------------")
     else:

@@ -1,3 +1,5 @@
+# This script manages the google secret manager connection.
+
 from google.cloud import secretmanager
 from stoploss.helper_scripts.helper import get_logger
 import yaml

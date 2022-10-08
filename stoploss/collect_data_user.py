@@ -1,3 +1,5 @@
+# Manages user related date on Kraken
+
 from stoploss.connect_kraken_private import get_account_balance, get_open_orders
 from stoploss.connect_kraken_public import get_asset_pairs
 from stoploss.helper_scripts.helper import get_logger
@@ -5,11 +7,13 @@ logger = get_logger("stoploss_logger")
 
 
 def resolve_three_character_currency_to_kraken_currency(exchange_currency_pair):
+    # Finds the correct kraken currency pair
     asset_pairs_details = get_asset_pairs(exchange_currency_pair)
     return [asset_pairs_details["result"][exchange_currency_pair]["base"], asset_pairs_details["result"][exchange_currency_pair]["quote"]]
 
 
 def get_account_balance_per_currency(exchange_currency_pair):
+    # returns the account balance per currency pair
     kraken_currencies = resolve_three_character_currency_to_kraken_currency(exchange_currency_pair)
 
     logger.debug("Collect real account balance ")
@@ -22,8 +26,11 @@ def get_account_balance_per_currency(exchange_currency_pair):
 
 
 def get_open_orders_for_currency_pair(exchange_currency_pair):
+    # Returns currently open Orders
 
-    # Kraken changes the currency pairs when I get open orders
+    # Kraken changes the currency pairs when I get open orders.
+    # Therefore there is a hardcoded mapping implemented here.
+    # If more then one currency pair should be supported it need to be changed here.
     match exchange_currency_pair:
         case "ZETHXEUR": exchange_currency_pair = "ETHEUR"
 

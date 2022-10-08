@@ -1,12 +1,17 @@
+# This script is implementing a trailing stop by allowing the possibility to constantly calculate new trigger.
+# This script this the logic of the
+
 from stoploss.collect_data_market import get_ohlc_dataframe, get_indicator_form_ohlc, get_last_trade_price
 from stoploss.helper_scripts.helper import get_logger
-from stoploss.strategy_stop_loss import get_interval_as_int
+from stoploss.strategy_stop_loss_helper import get_interval_as_int
 from decimal import Decimal
 
 logger = get_logger("stoploss_logger")
 
 
 def set_new_trigger(position, std, std_before, high, low, last_trade_price):
+    # This function finds a new trigger.
+
     # Ensure that the data type is Decimal and not float
     new_trigger: Decimal
     std_delta: Decimal
@@ -93,6 +98,8 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
 
 
 def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24):
+    # Main Function to manage the stop los trigger and implement the trailing stop strategy
+
     # Possible Situations
     # If Order is none: calculate a new trigger based on min or max and the current position
     # If Order is not none: use the existing trigger and calculate a new one

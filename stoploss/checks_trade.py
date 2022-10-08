@@ -1,3 +1,6 @@
+# These scripts make security checks to ensure that orders provided are valid.
+# These scripts should always work if the order is correctly provided.
+
 from decimal import Decimal
 from stoploss.collect_data_user import get_account_balance
 from stoploss.connect_kraken_private import get_open_orders
@@ -11,6 +14,7 @@ with open("trader_config.yml", "r") as yml_file:
 
 
 def check_order(trade_variable):
+    # Validation orchestrator function
     if check_if_supported_asset_pair(trade_variable) \
             and check_if_order_volume_high_enough(trade_variable) \
             and check_available_funds(trade_variable):
@@ -21,6 +25,7 @@ def check_order(trade_variable):
 
 
 def check_if_supported_asset_pair(trade_variable):
+    # Checks the config if this asset pair is supported.
     pair = trade_variable.pair
     supported_currencies = cfg["trading"]["supported_currencies"]
     if pair in supported_currencies:
@@ -32,8 +37,8 @@ def check_if_supported_asset_pair(trade_variable):
     return currency_supported
 
 
-# Checks if the order Volume is to low
 def check_if_order_volume_high_enough(trade_variable):
+    # Checks if the order Volume is to low
 
     kraken_min_order = round(Decimal(cfg["kraken_trade"]["minimum_order"][trade_variable.pair]), 3)
     volume = Decimal(trade_variable.volume)

@@ -1,3 +1,5 @@
+# This script manages all functions required for a private connections to kraken. Means all connections which require secrets.
+
 import traceback
 
 from stoploss.helper_scripts.helper import get_logger
@@ -92,8 +94,9 @@ def kraken_request(api_url, uri_path, data, api_key, api_sec):
     return req
 
 
-# Get the current account balance
 def get_account_balance(key_type):
+    # Get the current account balance
+
     endpoint = "Balance"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
@@ -103,8 +106,9 @@ def get_account_balance(key_type):
     return resp.json()
 
 
-# Get open Orders
 def get_open_orders(key_type):
+    # Get open Orders
+
     endpoint = "OpenOrders"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
@@ -117,6 +121,8 @@ def get_open_orders(key_type):
 
 
 def get_closed_orders(key_type, till=""):
+    # Get Closed Orders
+
     endpoint = "ClosedOrders"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
@@ -136,6 +142,8 @@ def get_closed_orders(key_type, till=""):
 
 
 def get_trades_history(key_type):
+    # Get Trades History.
+
     endpoint = "TradesHistory"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
@@ -148,6 +156,8 @@ def get_trades_history(key_type):
 
 
 def get_trade(txid, key_type):
+    # Get current trades.
+
     endpoint = "QueryTrades"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
     # Construct the request and return the result
@@ -160,8 +170,9 @@ def get_trade(txid, key_type):
     return resp.json()
 
 
-# Retrieve information about specific orders.
 def query_order_info(txid, key_type):
+    # Retrieve information about specific orders.
+
     endpoint = "QueryOrders"
     api_key, api_sec = get_secrets(key_type=key_type, version=cfg["kraken_private"]["development_keys"]["key_version"])  # Read Kraken API key and secret stored in environment variables
 
@@ -184,6 +195,8 @@ def query_order_info(txid, key_type):
 
 
 def trade_add_order(trade_dict, key_type):
+    # Creates a new order on kraken
+
     endpoint = "AddOrder"
     version = cfg["kraken_private"]["development_keys"]["key_version"]
     api_key, api_sec = get_secrets(key_type=key_type, version=version)  # Read Kraken API key and secret stored in environment variables
@@ -204,11 +217,13 @@ def trade_add_order(trade_dict, key_type):
 
 
 def did_order_change(trade_dict):
+    # This is related to trade_edit_order.
+    # Checks if the new order is actually changing. If not then there is no need to update the order
+
     open_order = get_open_orders("query")
     print(open_order)
     print(trade_dict)
-    changed_dict = {}
-    changed_dict["changed"] = True
+    changed_dict = {"changed": True}
     try:
         active_transaction = open_order["result"]["open"][trade_dict["txid"]]
     except KeyError:
@@ -229,6 +244,8 @@ def did_order_change(trade_dict):
 
 
 def trade_edit_order(trade_dict, key_type):
+    # Edits a Order
+
     endpoint = "EditOrder"
     version = cfg["kraken_private"]["development_keys"]["key_version"]
     api_key, api_sec = get_secrets(key_type=key_type, version=version)  # Read Kraken API key and secret stored in environment variables

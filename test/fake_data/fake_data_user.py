@@ -1,3 +1,5 @@
+# Script to provide test data
+
 from uuid import uuid4
 
 from stoploss.collect_data_market import get_last_trade_price

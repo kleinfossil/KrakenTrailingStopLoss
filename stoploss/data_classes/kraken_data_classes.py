@@ -1,3 +1,5 @@
+# Specific Data Classes used for Kraken Trades
+
 from dataclasses import dataclass
 import time
 from uuid import uuid4
@@ -5,6 +7,7 @@ from uuid import uuid4
 
 @dataclass
 class AddTrade:
+    # Dataclass to hold every data required to Add a Trade to Kraken
     trade_type: str = "AddTrade"                # The name of this dataclass
     uuid: uuid4 = uuid4().hex
     nonce: str = ""                             # User Signed API header. Must be always increasing number
@@ -42,9 +45,11 @@ class AddTrade:
     kraken_description: str = ""                # Description from Kraken received in the response
 
     def __post_init__(self):
+        # The Nonce is important for Kraken and must always go up. If there is a nonce error you need to create a new API Key in Kraken
         self.nonce = str(int(time.time()) * 1000)
 
     def set_example_values(self, timeinforce="", expiretm="0"):
+        # In case there are example values needed
         self.nonce = str(int(time.time()))
         self.userref = "90001000"
         self.ordertype = "stop-loss-limit"
@@ -68,6 +73,7 @@ class AddTrade:
         return asdict
 
     def print_trade(self):
+        # Prints the current data of the dataclass
         for attribute in dir(self):
             if not attribute.startswith('__') and not callable(getattr(self, attribute)):
                 value = getattr(self, attribute, None)
@@ -77,6 +83,7 @@ class AddTrade:
 
 @dataclass
 class EditOrder:
+    # Dataclass to hold every data required to Edit a Trade to Kraken
     trade_type: str = "EditOrder"               # The name of this dataclass
     uuid: uuid4 = uuid4().hex                   # Internal ID
     nonce: str = ""         # User Signed API header. Must be always increasing number
@@ -115,9 +122,11 @@ class EditOrder:
     kraken_description: str = ""                # Description from Kraken received in the response
 
     def __post_init__(self):
+        # The Nonce is important for Kraken and must always go up. If there is a nonce error you need to create a new API Key in Kraken
         self.nonce = str(int(time.time()) * 1000)
 
     def set_example_values(self, timeinforce="", expiretm="0"):
+        # In case there are example values needed
         self.nonce = str(int(time.time()))
         self.userref = "90001000"
         self.txid = "OHVFK7-BF5HY-PHECAP"
@@ -142,24 +151,11 @@ class EditOrder:
         return asdict
 
     def print_trade(self):
+        # Prints the current data of the dataclass
         for attribute in dir(self):
             if not attribute.startswith('__') and not callable(getattr(self, attribute)):
                 value = getattr(self, attribute, None)
                 if value != "":
                     print(f"{attribute}: {value}")
 
-
-@dataclass
-class Trade:
-    ordertxid: str  # Order responsible for execution of trade.
-    pair: str       # Asset pair. e.g. XETHZEUR
-    time: str
-    type: str
-    ordertype: str
-    price: str
-    cost: str
-    fee: str
-    vol: str
-    margin: str
-    misc: str
 

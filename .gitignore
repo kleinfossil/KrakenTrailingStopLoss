@@ -1,5 +1,4 @@
 /books/*
-api_key_development.yml
 /logs/*
-mail_info.yml
-/key_files/*
+/key_files/api_key_development.yml
+/key_files/mail_info.yml
