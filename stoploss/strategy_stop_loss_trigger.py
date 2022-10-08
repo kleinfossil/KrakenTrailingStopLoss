@@ -126,16 +126,17 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     last_trade_price = get_last_trade_price(position.exchange_currency_pair)
     position.current_trade_price = last_trade_price
 
-    print(f"\n"
-          f"Old Standard Deviation: {std_before} / New Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}")
+    print(f"--------> Stop Loss Calculation------->\n"
+          f"Old Standard Deviation: {std_before} / New Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}"
+          f"\n")
 
     if order is not None:
         logger.debug(f"There was an order provided. Calculate stop loss trigger based on existing order. Trigger Price was {order.price} {order.quote_currency}")
         position.trigger = Decimal(order.price)
 
     # Update Trigger
-    print(f"Current Trigger: {position.trigger} {position.quote_currency}")
+    print(f"Current Trigger:    {position.trigger} {position.quote_currency}")
     position = set_new_trigger(position, std, std_before, high, low, last_trade_price)
-    print(f"New Trigger: {position.trigger} {position.quote_currency}")
+    print(f"New Trigger:        {position.trigger} {position.quote_currency}")
 
     return position

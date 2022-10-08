@@ -38,7 +38,6 @@ def prepare_order_data(position, volume, price, price2):
 
 
 def add_order(position, buy_sell_type, volume, price, price2, trade_reason_message="NOT PROVIDED"):
-
     data_for_trading = prepare_order_data(position=position, volume=volume, price=price, price2=price2)
 
     # Create a new trade using price and volume
@@ -69,27 +68,26 @@ def edit_order(position, txid, buy_sell_type, volume, price, price2, trade_reaso
     # Step 3: Check if the trade requires any pre-trade executions. If not, execute Trade
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(modified_order)
-    format_trading_message(message_type="outro", position=position)
+    format_trading_message(message_type="outro", position=position, resp=resp_json)
 
 
-def format_trading_message(message_type, position, trade_message="Trade", trade_reason_message="", buy_sell_type="", volume: Decimal = 0, price: Decimal = 0.0, price2: Decimal = 0.0):
+def format_trading_message(message_type, position, trade_message="Trade", trade_reason_message="", buy_sell_type="", volume: Decimal = 0, price: Decimal = 0.0, price2: Decimal = 0.0, resp=None):
     # Output show on the screen during trading
 
     if message_type == "intro":
-        print(f"--------> {trade_message}------->")
+        print(f"---------------> {trade_message} ------------->")
         print(f"Trade Reason: {trade_reason_message}")
         print("")
-        print(f"Assets before Trade:")
         position.print_position()
+        print("New Order")
+        print(f"    Order: {buy_sell_type} - {position.exchange_currency_pair}\n"
+              f"    Volume: {volume}\n"
+              f"    Trigger: {price} - Limit Price: {price2}\n"
+              f"    Order Value: {volume * price}")
         print("")
-        print("###")
-        print(f"Order: {buy_sell_type} - {position.exchange_currency_pair}\n"
-              f"Volume: {volume}\n"
-              f"Trigger: {price} - Limit Price: {price2}\n"
-              f"Order Value: {volume * price}")
-        print("###")
     elif message_type == "outro":
-        print("<----------------------")
+        if resp != "":
+            print(f"Kraken Response received: {resp}")
+        print("<---------------------------------")
     else:
         raise RuntimeError(f"{message_type=} is not valid for formatting")
-

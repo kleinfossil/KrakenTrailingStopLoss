@@ -221,8 +221,9 @@ def did_order_change(trade_dict):
     # Checks if the new order is actually changing. If not then there is no need to update the order
 
     open_order = get_open_orders("query")
-    print(open_order)
-    print(trade_dict)
+    logger.debug("Check if the market order and the new order is the same")
+    logger.debug(f"Open Order recived from Kraken: {open_order}")
+    logger.debug(f"Planned Order to be executed: {trade_dict}")
     changed_dict = {"changed": True}
     try:
         active_transaction = open_order["result"]["open"][trade_dict["txid"]]
@@ -259,9 +260,9 @@ def trade_edit_order(trade_dict, key_type):
         if changed_dict["changed"]:
             resp = kraken_request(api_domain, f'{api_path}{endpoint}', trade_dict, api_key, api_sec)
         else:
-            logger.info(f"Order is the same as an existing on Kraken. Order not send to Kraken\n"
-                        f"Current Order: {changed_dict['current']}\n"
-                        f"New Order: {changed_dict['new']}")
+            print(f"Order is the same as an existing on Kraken. Order not send to Kraken\n"
+                  f"Current Order: {changed_dict['current']}\n"
+                  f"New Order: {changed_dict['new']}")
             resp = ""
     else:
         raise RuntimeError(f"{kill_switch=} is not set correctly")

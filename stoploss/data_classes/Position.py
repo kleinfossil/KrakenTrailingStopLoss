@@ -36,7 +36,7 @@ class Position:
         open_book(book_name)
 
     def print_position(self):
-        print(f"Current Position:")
+        print(f"Current Trader Position before Trade:")
         print(f"    Base: {self.current_volume_of_base_currency} {self.base_currency}")
         print(f"    Quote: {self.current_volume_of_quote_currency} {self.quote_currency}")
         print(f"    Trigger: {self.trigger} {self.quote_currency}")

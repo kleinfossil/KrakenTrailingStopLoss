@@ -2,7 +2,7 @@ basic:
   book-storage-location: "books/"
   mail_key_file_location: "key_files/mail_info.yml"
   logs-location: "logs/"
-  pretty_waiting_time: 1 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
+  pretty_waiting_time: 0 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
 
 trading:
   supported_currencies: "XETHZEUR"
@@ -23,16 +23,16 @@ trading:
         minmax_history: 10 # How much history epochs should be used to find a minmax value.
 
 debugging:
-  log-level: "DEBUG" # Log Level must be equal or lower than file file_log_level.
-  file_log_level: "WARNING"
-  send_error_mails: 0 # Setting it to 1 will send error mails based on the mail_info.yml configuration
+  log-level: "ERROR" # Log Level must be equal or lower than file file_log_level.
+  file_log_level: "ERROR"
+  send_error_mails: 1 # Setting it to 1 will send error mails based on the mail_info.yml configuration
   use-fake-user-balance: 0 # 1 will use fake values, while 0 will get real values.
   kraken:
     make_trade: 1 # 1 will make a real trade, while 0 will use fake trade data.
     use_real_trading_data: 1 # 1 will use data as provided to the trade. 0 will overwrite this data with predefined fake data.
     make_real_query: 1 # 1 will make a real query. 0 will respond with fake data.
     kill_switch: "trade" # switch setup before every add trade, modify trade and cancel trade kraken call. If 'do_not_trade' then no request to kraken will be made. If 'trade' requests to kraken will be made.
-    kraken_validation: 0 # If 0 the "validate" parameter of the kraken API will be set to "true". Means no trade will be made and kraken will just validate the transaction. If set to 1 it will make a real trade.
+    kraken_validation: 1 # If 0 the "validate" parameter of the kraken API will be set to "true". Means no trade will be made and kraken will just validate the transaction. If set to 1 it will make a real trade.
 
 kraken_private:
   google:

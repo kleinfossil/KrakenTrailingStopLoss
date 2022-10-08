@@ -12,7 +12,7 @@ from stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
     convert_datetime_to_unix_time,
-    pretty_waiting_time)
+    pretty_waiting_time, convert_unix_time_to_datetime)
 from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
 from stoploss.data_classes.Position import Position, Order
 from stoploss.strategy_stop_loss_helper import (
@@ -79,7 +79,7 @@ def get_currency_pair(base_currency, quote_currency):
             raise RuntimeError(f"{base_currency=} and {quote_currency=} are not a supported exchange currency pair.")
         return exchange_currency_pair
     except RuntimeError as e:
-        logger.error(traceback.print_stack(),e)
+        logger.error(traceback.print_stack(), e)
 
 
 def create_position(base_currency, quote_currency, current_std):
@@ -104,7 +104,7 @@ def create_position(base_currency, quote_currency, current_std):
                                 )
         return new_position
     except RuntimeError as e:
-        logger.error(traceback.print_stack(),e)
+        logger.error(traceback.print_stack(), e)
 
 
 def init_program():
@@ -257,7 +257,14 @@ if __name__ == "__main__":
         std_change: Decimal = Decimal(0)
 
         # Start trading
+        print(f"### STOP LOSS TRADER IS RUNNING ###\n"
+              f"Trader will run till --> {trade_arguments.trading_time}\n")
+
+        i = 1
         while time_till_finish >= time.time():
+            current_time = convert_unix_time_to_datetime(time.time())
+            print(f"_________> RUN {i} at {current_time} <_________")
+            print("")
             logger.debug(f"Before trading: {std_change=}")
             traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
             std_change = traded_position.current_std
@@ -272,6 +279,8 @@ if __name__ == "__main__":
             else:
                 logger.debug("Pretty Waiting Time is deactivated.")
                 time.sleep(cfg["trading"]["waiting_time"])
+            i += 1
+
         post_program()
     except RuntimeError as e:
         exception_handling(e)
@@ -285,10 +294,3 @@ if __name__ == "__main__":
     except Exception as e:
         exception_handling(e)
         exit(0)
-
-
-
-
-
-
-
