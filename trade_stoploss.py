@@ -168,7 +168,7 @@ def trade_position(base_currency, quote_currency, current_std):
             # Check open orders and the differences to the current position
             orders_in_scope = get_open_orders_for_currency_pair(active_position.exchange_currency_pair)
 
-            # Check if more then one order exists
+            # Check if more than one order exists
             if len(orders_in_scope) > 1:
                 raise RuntimeError(f"There is more then one open order for the pair {active_position.exchange_currency_pair}. The trader is currently not able to handle more then one transaction")
 
