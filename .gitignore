@@ -2,3 +2,4 @@
 /logs/*
 /key_files/api_key_development.yml
 /key_files/mail_info.yml
+__pycache__
