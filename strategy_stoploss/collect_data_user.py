@@ -1,8 +1,8 @@
 # Manages user related date on Kraken
 
-from stoploss.connect_kraken_private import get_account_balance, get_open_orders
-from stoploss.connect_kraken_public import get_asset_pairs
-from stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.connect_kraken_private import get_account_balance, get_open_orders
+from strategy_stoploss.connect_kraken_public import get_asset_pairs
+from strategy_stoploss.helper_scripts.helper import get_logger
 logger = get_logger("stoploss_logger")
 
 

@@ -7,21 +7,21 @@ import time
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
-from stoploss.helper_scripts.helper import (
+from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
+from strategy_stoploss.helper_scripts.helper import (
     get_logger,
     set_log_level,
     convert_datetime_to_unix_time,
     pretty_waiting_time, convert_unix_time_to_datetime)
-from stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
-from stoploss.data_classes.Position import Position, Order
-from stoploss.strategy_stop_loss_helper import (
+from strategy_stoploss.collect_data_user import get_account_balance_per_currency, get_open_orders_for_currency_pair
+from strategy_stoploss.data_classes.Position import Position, Order
+from strategy_stoploss.strategy_stop_loss_helper import (
     get_buy_or_sell_type,
     get_limit_price_and_volume)
-from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
+from strategy_stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
-from stoploss.trading import add_order, edit_order
-from stoploss.data_classes.global_data import set_google_secret, reset_google_secret
+from strategy_stoploss.trading import add_order, edit_order
+from strategy_stoploss.data_classes.global_data import set_google_secret, reset_google_secret
 from src.send_mail import send_error_mail
 import yaml
 from yaml.loader import SafeLoader

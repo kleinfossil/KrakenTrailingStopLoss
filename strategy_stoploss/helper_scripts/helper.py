@@ -1,12 +1,13 @@
 # Script functions which are generic and not specific to this project
 import math
 import datetime
+import pickle
 import time
 import logging
 import traceback
 
 from tqdm import tqdm
-from stoploss.helper_scripts.formated_logger import CustomFormatter
+from strategy_stoploss.helper_scripts.formated_logger import CustomFormatter
 import yaml
 from yaml.loader import SafeLoader
 
@@ -93,3 +94,5 @@ def pretty_waiting_time(waiting_time):
     # Creates a pretty waiting time. This can be sometimes messed up and create errors. Therefore you can deactivate it in the trader_config.yml
     for i in tqdm(range(1, waiting_time)):
         time.sleep(1)
+
+

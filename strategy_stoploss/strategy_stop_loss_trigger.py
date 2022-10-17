@@ -1,9 +1,9 @@
 # This script is implementing a trailing stop by allowing the possibility to constantly calculate new trigger.
 # This script this the logic of the
 
-from stoploss.collect_data_market import get_ohlc_dataframe, get_indicator_form_ohlc, get_last_trade_price
-from stoploss.helper_scripts.helper import get_logger
-from stoploss.strategy_stop_loss_helper import get_interval_as_int
+from strategy_stoploss.collect_data_market import get_ohlc_dataframe, get_indicator_form_ohlc, get_last_trade_price
+from strategy_stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.strategy_stop_loss_helper import get_interval_as_int
 from decimal import Decimal
 
 logger = get_logger("stoploss_logger")

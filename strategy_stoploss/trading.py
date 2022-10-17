@@ -1,8 +1,8 @@
 # This script prepares the trading date so that it can be handed over to a market like kraken.
 
 from decimal import Decimal
-from stoploss.data_classes.kraken_data_classes import AddTrade, EditOrder
-from stoploss.execute_kraken_add_edit_cancel import execute_order
+from strategy_stoploss.data_classes.kraken_data_classes import AddTrade, EditOrder
+from strategy_stoploss.execute_kraken_add_edit_cancel import execute_order
 import yaml
 from yaml.loader import SafeLoader
 
@@ -51,7 +51,7 @@ def add_order(position, buy_sell_type, volume, price, price2, trade_reason_messa
     # Step 3: Check if the trade requires any pre-trade executions. If not, execute Trade
     # --> At this point the trade will be handover to Kraken
     resp_json, trade_execution_check = execute_order(trade)
-    format_trading_message(message_type="outro", position=position)
+    format_trading_message(message_type="outro", position=position, resp=resp_json)
 
     return trade
 

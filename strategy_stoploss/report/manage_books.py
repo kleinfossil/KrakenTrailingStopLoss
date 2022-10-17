@@ -1,7 +1,7 @@
 # This script manages the creation of CSV and excel reports (called books). Which allows to keep track what the program does
 import traceback
 
-from stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.helper_scripts.helper import get_logger
 
 import pandas as pd
 import yaml

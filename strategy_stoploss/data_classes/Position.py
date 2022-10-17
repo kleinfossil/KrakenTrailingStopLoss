@@ -2,8 +2,8 @@
 from dataclasses import dataclass
 import time
 
-from stoploss.helper_scripts.helper import convert_unix_time_to_datetime
-from stoploss.report.manage_books import *
+from strategy_stoploss.helper_scripts.helper import convert_unix_time_to_datetime
+from strategy_stoploss.report.manage_books import *
 from decimal import Decimal
 
 

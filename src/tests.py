@@ -1,10 +1,10 @@
-from stoploss.connect_kraken_private import query_order_info, get_open_orders, get_trades_history, get_trade
-from stoploss.collect_data_user import get_open_orders_for_currency_pair, get_account_balance_per_currency
+from strategy_stoploss.connect_kraken_private import query_order_info, get_open_orders, get_trades_history, get_trade
+from strategy_stoploss.collect_data_user import get_open_orders_for_currency_pair, get_account_balance_per_currency
 
 # just some methods to test methods directly
-from src.report_trades import get_closed_trades_for_reporting, init_book
-from stoploss.data_classes.global_data import set_google_secret, get_google_secret
-from stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
+from src.main_report_trades import get_closed_trades_for_reporting, init_book
+from strategy_stoploss.data_classes.global_data import set_google_secret, get_google_secret
+from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 
 
 def test_query_order_info():

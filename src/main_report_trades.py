@@ -1,8 +1,8 @@
 # This script reports trades and creates a report of all and all closed trades
 import time
 
-from stoploss.connect_kraken_private import get_closed_orders
-from stoploss.helper_scripts.helper import get_logger, convert_unix_time_to_datetime
+from strategy_stoploss.connect_kraken_private import get_closed_orders
+from strategy_stoploss.helper_scripts.helper import get_logger, convert_unix_time_to_datetime
 import pandas as pd
 import yaml
 from yaml.loader import SafeLoader

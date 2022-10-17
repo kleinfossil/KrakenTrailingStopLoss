@@ -2,11 +2,11 @@
 # These scripts should always work if the order is correctly provided.
 
 from decimal import Decimal
-from stoploss.collect_data_user import get_account_balance
-from stoploss.connect_kraken_private import get_open_orders
+from strategy_stoploss.collect_data_user import get_account_balance
+from strategy_stoploss.connect_kraken_private import get_open_orders
 import yaml
 from yaml.loader import SafeLoader
-from stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.helper_scripts.helper import get_logger
 logger = get_logger("stoploss_logger")
 
 with open("trader_config.yml", "r") as yml_file:

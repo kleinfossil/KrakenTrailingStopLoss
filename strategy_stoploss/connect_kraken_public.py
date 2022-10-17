@@ -2,7 +2,7 @@
 import traceback
 import requests
 import time
-from stoploss.helper_scripts.helper import (
+from strategy_stoploss.helper_scripts.helper import (
     get_logger)
 
 logger = get_logger("stoploss_logger")

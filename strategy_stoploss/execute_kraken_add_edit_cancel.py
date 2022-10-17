@@ -1,8 +1,8 @@
 # Manages the Orders of the Traders. This script can be seen as the Orchestrator for every Kraken Order
 
-from stoploss.helper_scripts.helper import get_logger
-from stoploss.connect_kraken_private import get_secrets, trade_add_order, trade_edit_order
-from stoploss.checks_trade import check_order
+from strategy_stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.connect_kraken_private import get_secrets, trade_add_order, trade_edit_order
+from strategy_stoploss.checks_trade import check_order
 from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
 from yaml.loader import SafeLoader

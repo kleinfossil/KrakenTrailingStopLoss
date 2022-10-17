@@ -1,10 +1,10 @@
 # Script functions which extract and transform data
 import traceback
 import pandas as pd
-from stoploss.connect_kraken_public import (
+from strategy_stoploss.connect_kraken_public import (
     get_ohlc_json,
     get_ticker)
-from stoploss.helper_scripts.helper import (
+from strategy_stoploss.helper_scripts.helper import (
     convert_unix_time_to_datetime,
     get_stdev,
     get_logger)

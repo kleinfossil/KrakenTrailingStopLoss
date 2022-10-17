@@ -2,9 +2,9 @@
 
 import traceback
 
-from stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.helper_scripts.helper import get_logger
 from test.fake_data.fake_data_user import fake_response_query_data
-from stoploss.data_classes.global_data import get_google_secret
+from strategy_stoploss.data_classes.global_data import get_google_secret
 import urllib.parse
 import hashlib
 import hmac
@@ -103,7 +103,8 @@ def get_account_balance(key_type):
     resp = kraken_request(api_domain, f'{api_path}{endpoint}', {
         "nonce": str(int(1000 * time.time()))
     }, api_key, api_sec)
-    return resp.json()
+    json_response = resp.json()
+    return json_response
 
 
 def get_open_orders(key_type):
@@ -117,7 +118,8 @@ def get_open_orders(key_type):
         "trades": True
     }, api_key, api_sec)
     logger.debug(f"Open Orders received from Kraken. Orders: {str(resp.json())}")
-    return resp.json()
+    json_response = resp.json()
+    return json_response
 
 
 def get_closed_orders(key_type, till=""):

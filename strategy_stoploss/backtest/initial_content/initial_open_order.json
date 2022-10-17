@@ -1,0 +1,29 @@
+{"error": [],
+"result":
+  {"open":
+    {"OUN3AM-4Y5QV-UJPT7M":
+      {"refid": "None",
+        "link_id": "ONILUM-B6WBI-4HACIO",
+        "userref": "backtest",
+        "status": "open",
+        "opentm": "",
+        "starttm": "0",
+        "expiretm": "0",
+        "descr":
+          {"pair": "ETHEUR",
+            "type": "sell",
+            "ordertype": "stop-loss-limit",
+            "price": "0.00",
+            "price2": "0.00",
+            "leverage": "none",
+            "order": "",
+            "close": ""},
+        "vol": "0.00",
+        "vol_exec": "0.00000000",
+        "cost": "0.00000",
+        "fee": "0.00000",
+        "price": "0.00000",
+        "stopprice": "0.00000",
+        "limitprice": "0.00000",
+        "misc": "",
+        "oflags": "fciq"}}}}

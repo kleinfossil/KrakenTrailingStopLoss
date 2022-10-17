@@ -2,8 +2,8 @@
 
 from uuid import uuid4
 
-from stoploss.collect_data_market import get_last_trade_price
-from stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.collect_data_market import get_last_trade_price
+from strategy_stoploss.helper_scripts.helper import get_logger
 logger = get_logger("stoploss_logger")
 
 

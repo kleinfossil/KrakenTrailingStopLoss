@@ -2,8 +2,8 @@
 
 import traceback
 from decimal import Decimal
-from stoploss.collect_data_user import get_account_balance_per_currency
-from stoploss.helper_scripts.helper import (
+from strategy_stoploss.collect_data_user import get_account_balance_per_currency
+from strategy_stoploss.helper_scripts.helper import (
     get_logger)
 import yaml
 from yaml.loader import SafeLoader
