@@ -22,7 +22,7 @@ from stoploss.strategy_stop_loss_trigger import calculate_stop_loss_trigger
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from stoploss.trading import add_order, edit_order
 from stoploss.data_classes.global_data import set_google_secret, reset_google_secret
-from send_mail import send_error_mail
+from src.send_mail import send_error_mail
 import yaml
 from yaml.loader import SafeLoader
 

@@ -1,4 +1,5 @@
 # This script reports trades and creates a report of all and all closed trades
+import time
 
 from stoploss.connect_kraken_private import get_closed_orders
 from stoploss.helper_scripts.helper import get_logger, convert_unix_time_to_datetime
@@ -27,13 +28,21 @@ def manage_book(book_name):
     # Means a start date with 01.10.2022 and End Date 05.10.2022 would provide all data between these dates.
     # If I want to get all the data I start with today and then move the End date back to the latest entry while start date is not used.
     while (last_response_txid != first_response_txid) and last_transaction_not_in_trade_list:
-        next_trade_list = transform_order_into_book(get_closed_orders(key_type="query", till=last_response_txid))
-        first_response_txid = next_trade_list[0]["txid"]
-        last_response_txid = next_trade_list[-1]["txid"]
-        if not all_trades_book.empty:
-            if last_response_txid in all_trades_book["txid"].values:
-                last_transaction_not_in_trade_list = False
-        all_trades_book = append_to_book(book=all_trades_book, book_entries=next_trade_list)
+        closed_orders = get_closed_orders(key_type="query", till=last_response_txid)
+        if len(closed_orders["error"]) == 0:
+            next_trade_list = transform_order_into_book(closed_orders)
+            first_response_txid = next_trade_list[0]["txid"]
+            last_response_txid = next_trade_list[-1]["txid"]
+            if not all_trades_book.empty:
+                if last_response_txid in all_trades_book["txid"].values:
+                    last_transaction_not_in_trade_list = False
+            all_trades_book = append_to_book(book=all_trades_book, book_entries=next_trade_list)
+        elif closed_orders["error"][0] == "EAPI:Rate limit exceeded":
+            i = 40
+            logger.info(f"API Rate Limit. Waiting: {i}")
+            time.sleep(i)
+        else:
+            raise RuntimeError(f"API Error: {closed_orders['error']}")
     save_files(name=book_name, book=all_trades_book)
     save_files(name="closed_trades", book=create_closed_orders_book(all_trades_book))
 
@@ -157,27 +166,27 @@ def get_closed_trades_for_reporting(book, till="OLHFIA-WPUQN-XZ4PF6"):
     dict_list = []
     for txid in all_txids:
         trade_details = {
-            "txid":             txid,
-            "userref":          orders[txid]["userref"],
-            "status":           orders[txid]["status"],
-            "open_time_unix":   orders[txid]["opentm"],
-            "close_time_unix":  orders[txid]["closetm"],
-            "open_time":        convert_unix_time_to_datetime(orders[txid]["opentm"]),
-            "close_time":       convert_unix_time_to_datetime(orders[txid]["closetm"]),
-            "pair":             orders[txid]["descr"]["pair"],
-            "type":             orders[txid]["descr"]["type"],
-            "order_type":       orders[txid]["descr"]["ordertype"],
-            "order_trigger":    orders[txid]["descr"]["price"],
-            "order_limit":      orders[txid]["descr"]["price2"],
-            "order_volume":     orders[txid]["vol"],
-            "executed_volume":  orders[txid]["vol_exec"],
+            "txid": txid,
+            "userref": orders[txid]["userref"],
+            "status": orders[txid]["status"],
+            "open_time_unix": orders[txid]["opentm"],
+            "close_time_unix": orders[txid]["closetm"],
+            "open_time": convert_unix_time_to_datetime(orders[txid]["opentm"]),
+            "close_time": convert_unix_time_to_datetime(orders[txid]["closetm"]),
+            "pair": orders[txid]["descr"]["pair"],
+            "type": orders[txid]["descr"]["type"],
+            "order_type": orders[txid]["descr"]["ordertype"],
+            "order_trigger": orders[txid]["descr"]["price"],
+            "order_limit": orders[txid]["descr"]["price2"],
+            "order_volume": orders[txid]["vol"],
+            "executed_volume": orders[txid]["vol_exec"],
             "executed_trigger": orders[txid]["stopprice"],
-            "executed_limit":   orders[txid]["limitprice"],
-            "total_cost":       orders[txid]["cost"],
-            "total_fee":        orders[txid]["fee"],
-            "avg_price":        orders[txid]["price"],
-            "misc":             orders[txid]["misc"],
-            "oflags":           orders[txid]["oflags"],
+            "executed_limit": orders[txid]["limitprice"],
+            "total_cost": orders[txid]["cost"],
+            "total_fee": orders[txid]["fee"],
+            "avg_price": orders[txid]["price"],
+            "misc": orders[txid]["misc"],
+            "oflags": orders[txid]["oflags"],
         }
         if "trades" in orders[txid]:
             trade_details["related_trades"] = orders[txid]["trades"]
@@ -192,7 +201,3 @@ def get_closed_trades_for_reporting(book, till="OLHFIA-WPUQN-XZ4PF6"):
 if __name__ == "__main__":
     # This makes it executable
     manage_book("all_orders")
-
-
-
-
