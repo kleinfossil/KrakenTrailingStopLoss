@@ -13,7 +13,7 @@ from strategy_stoploss.backtest.set_kraken_private import set_account_balance, s
 
 class TestBacktest(unittest.TestCase):
 
-    @unittest.skip('test_get_account_balance - Is working')
+    # @unittest.skip('test_get_account_balance - Is working')
     def test_get_account_balance(self):
         response = get_account_balance("backtest")
         test_value = {'error': [], 'result': {'XETH': '0.00', 'ZEUR': '0.00'}}
@@ -74,8 +74,8 @@ class TestBacktest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_account_balance.pickle")
-        # clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.pickle")
+        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_account_balance.pickle")
+        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.json")
         print("done")
 
 
