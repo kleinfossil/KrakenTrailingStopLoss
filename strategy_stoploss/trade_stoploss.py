@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 dir_path = os.path.dirname(os.path.realpath(__file__))
 main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
 os.chdir(main_dir_path)
-sys.path.append(f"{main_dir_path}/strategy_stoploss")
+sys.path.append(f"{main_dir_path}")
 
 
 from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
