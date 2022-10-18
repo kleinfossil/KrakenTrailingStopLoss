@@ -4,6 +4,11 @@ import requests
 import time
 from strategy_stoploss.helper_scripts.helper import (
     get_logger)
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 logger = get_logger("stoploss_logger")
 
@@ -11,12 +16,13 @@ api_domain = "https://api.kraken.com"
 api_path = "/0/public/"
 
 
-def make_public_data_request(api_request, request_try=3):
+def make_public_data_request(api_request, request_try=int(cfg["kraken_trade"]["max_retries_error_requests"])):
     # Creates a public data request. Sometimes the data is not provided immediately. In this case it tries 3 times.
 
     logger.info(f"Preparing URL Public Request: {api_request}")
     request_finished = False
     request_attempts = 1
+    sleeping_counter = int(cfg["kraken_trade"]["sleep_time_between_error_requests"])
     try:
         while (not request_finished) and (request_attempts <= request_try):
             try:
@@ -25,14 +31,15 @@ def make_public_data_request(api_request, request_try=3):
                 if resp.status_code == 200:
                     request_finished = True
                     return resp
-                time.sleep(10)
             except Exception as e:
                 logger.error(f"Public Data Request - {request_attempts=}  <= {request_try=}\n"
                              f"Response was: {resp}\n"
                              f"{traceback.print_stack()} {e}")
+            time.sleep(sleeping_counter)
+            sleeping_counter += 10
         raise RuntimeError(f"The following public API Request could not be executed : {api_request}")
     except RuntimeError as e:
-        logger.error(f"{traceback.print_stack()} {e}")
+        logger.error(f"Public Request failed. {traceback.print_stack()} {e}")
 
 
 def check_response_for_errors(json_response, api_request):

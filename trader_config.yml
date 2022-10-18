@@ -55,6 +55,8 @@ kraken_trade:
       volume_decimals: 8
   minimum_order:
     XETHZEUR: 0.001
+  sleep_time_between_error_requests: 10 # Number of seconds to sleep in case Kraken does not respond on non-trading requests. Trading requests will always stop the program in case of an error.
+  max_retries_error_requests: 5  # Number of times the program should try to retry a Kraken non-trading request. Trading requests (buy and sell) are never retried. Instead, if will through an error and stop the program.
 
 book:
   till: "1629583200"
