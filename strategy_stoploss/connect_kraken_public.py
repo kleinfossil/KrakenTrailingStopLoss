@@ -27,13 +27,14 @@ def make_public_data_request(api_request, request_try=int(cfg["kraken_trade"]["m
         while (not request_finished) and (request_attempts <= request_try):
             try:
                 resp = requests.get(api_request)
-                request_attempts += 1
+
                 if resp.status_code == 200:
                     request_finished = True
                     return resp
             except Exception as e:
                 logger.error(f"Public Data Request - {request_attempts=}  <= {request_try=}\n"
                              f"{traceback.print_stack()} {e}")
+            request_attempts += 1
             time.sleep(sleeping_counter)
             sleeping_counter += 10
         raise RuntimeError(f"The following public API Request could not be executed : {api_request}")
