@@ -5,6 +5,11 @@ from strategy_stoploss.collect_data_market import get_ohlc_dataframe, get_indica
 from strategy_stoploss.helper_scripts.helper import get_logger
 from strategy_stoploss.strategy_stop_loss_helper import get_interval_as_int
 from decimal import Decimal
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 logger = get_logger("stoploss_logger")
 
@@ -24,6 +29,9 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
     # if the std got smaller the distance between price and trigger should get smaller
     # if the std got bigger the distance between price and trigger should get bigger
     std_delta = std - std_before
+    min_delta = Decimal(cfg["trading"]["strategy"]["stop_loss"]["config"]["std_delta_min_difference"])
+    if (min_delta*-1) < std_delta < min_delta:
+        std_delta = Decimal(0.00)
     logger.debug(f"{std_delta=} = {std=} - {std_before=}")
 
     # Sell Position / Trigger below current price / Move trigger up when price rises

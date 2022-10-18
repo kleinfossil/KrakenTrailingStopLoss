@@ -21,6 +21,7 @@ trading:
         standard_deviation_history: 10 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
         minmax_interval: "h" # Interval used to find the minimum or maximum value. d=days, h=hours, m=minutes
         minmax_history: 10 # How much history epochs should be used to find a minmax value.
+        std_delta_min_difference: 2 # standard deviation difference between old and new. If the difference is smaller the delta will be set to 0
 
 debugging:
   log-level: "ERROR" # Log Level must be equal or lower than file file_log_level.
