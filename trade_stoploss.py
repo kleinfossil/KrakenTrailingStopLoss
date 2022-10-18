@@ -7,14 +7,6 @@ import time
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-# Before I can import anything from this project I need to make sure that I am working at the same directory as the function I want to test
-# The following will change the working directory to \StopLoss\
-dir_path = os.path.dirname(os.path.realpath(__file__))
-main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
-os.chdir(main_dir_path)
-sys.path.append(f"{main_dir_path}")
-
-
 from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 from strategy_stoploss.helper_scripts.helper import (
     get_logger,
