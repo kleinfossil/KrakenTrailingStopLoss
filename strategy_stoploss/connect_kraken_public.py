@@ -27,7 +27,7 @@ def make_public_data_request(api_request, request_try=3):
                     return resp
                 time.sleep(10)
             except Exception as e:
-                logger.error(f"Public Data Request - {request_attempts=} \n"
+                logger.error(f"Public Data Request - {request_attempts=}  <= {request_try=}\n"
                              f"Response was: {resp}\n"
                              f"{traceback.print_stack()} {e}")
         raise RuntimeError(f"The following public API Request could not be executed : {api_request}")
