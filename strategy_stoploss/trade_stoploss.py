@@ -1,11 +1,17 @@
 # This script implements the Stop Loss trading.
-
+import os
 import sys
 import traceback
 import argparse
 import time
 from decimal import Decimal
 from datetime import datetime, timedelta
+
+# Before I can import anything from this project I need to make sure that I am working at the same directory as the function I want to test
+# The following will change the working directory to \StopLoss\
+dir_path = os.path.dirname(os.path.realpath(__file__))
+main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
+os.chdir(main_dir_path)
 
 from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 from strategy_stoploss.helper_scripts.helper import (
@@ -22,7 +28,7 @@ from strategy_stoploss.strategy_stop_loss_trigger import calculate_stop_loss_tri
 from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from strategy_stoploss.trading import add_order, edit_order
 from strategy_stoploss.data_classes.global_data import set_google_secret, reset_google_secret
-from src.send_mail import send_error_mail
+from strategy_stoploss.helper_scripts.send_mail import send_error_mail
 import yaml
 from yaml.loader import SafeLoader
 

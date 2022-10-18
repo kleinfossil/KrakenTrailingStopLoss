@@ -19,7 +19,7 @@ logger = get_logger("main_logger", log_level)
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    call(["python", "src/trade_stoploss.py", "--trading_time", "2023-12-31T00:00:00+0200", "--log_level", log_level, "--secret_type", "local"])
+    call(["python", "strategy_stoploss/trade_stoploss.py", "--trading_time", "2023-12-31T00:00:00+0200", "--log_level", log_level, "--secret_type", "local"])
 
     logger.info("Program Executed")
 
