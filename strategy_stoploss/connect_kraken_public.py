@@ -33,7 +33,6 @@ def make_public_data_request(api_request, request_try=int(cfg["kraken_trade"]["m
                     return resp
             except Exception as e:
                 logger.error(f"Public Data Request - {request_attempts=}  <= {request_try=}\n"
-                             f"Response was: {resp}\n"
                              f"{traceback.print_stack()} {e}")
             time.sleep(sleeping_counter)
             sleeping_counter += 10

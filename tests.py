@@ -1,10 +1,11 @@
-from strategy_stoploss.connect_kraken_private import query_order_info, get_open_orders, get_trades_history, get_trade
+from strategy_stoploss.connect_kraken_private import query_order_info, get_open_orders, get_trades_history, get_trade, get_closed_orders
 from strategy_stoploss.collect_data_user import get_open_orders_for_currency_pair, get_account_balance_per_currency
 
 # just some methods to test methods directly
 from main_report_trades import get_closed_trades_for_reporting, init_book
 from strategy_stoploss.data_classes.global_data import set_google_secret, get_google_secret
 from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
+from strategy_stoploss.trading import get_fee_adjusted_price_and_earnings
 
 
 def test_query_order_info():
@@ -21,9 +22,9 @@ def test_get_open_orders():
 
 
 def test_get_closed_orders():
-    #resp = get_closed_orders(key_type="query")
-    active_book = init_book()
-    resp = get_closed_trades_for_reporting(active_book)
+    resp = get_closed_orders(key_type="query")
+    #active_book = init_book()
+    #resp = get_closed_trades_for_reporting(active_book)
     print("test_get_closed_orders executed")
     return resp
 
@@ -63,15 +64,20 @@ def test_set_google_secrets():
     print(get_google_secret())
 
 
+def test_get_positive_negative_trading():
+    print(get_fee_adjusted_price_and_earnings())
+
+
 if __name__ == "__main__":
     #test_query_order_info()
     #test_get_open_orders()
 
-    #test_get_closed_orders()
+    # test_get_closed_orders()
     #test_get_only_ETH_tx()
     #test_get_account_balances()
-    #test_trades_and_trade()
+    # test_trades_and_trade()
 
-    test_set_google_secrets()
+    # test_set_google_secrets()
+    test_get_positive_negative_trading()
 
     print("Test done")
