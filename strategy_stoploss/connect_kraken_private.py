@@ -82,13 +82,12 @@ def kraken_request(api_url, uri_path, data, api_key, api_sec):
     # get_kraken_signature() as defined in the 'Authentication' section
     headers = {'API-Key': api_key, 'API-Sign': get_kraken_signature(uri_path, data, api_sec)}
 
-
     try:
         logger.info(f"Preparing URL Private Request: {api_url}{uri_path}{data}")
         req = requests.post((api_url + uri_path), headers=headers, data=data)
     except RuntimeError as err:
         logger.error(f"The Request to Kraken was not successful. "
-                     f"The following was called without secrets {api_url}{uri_path}{data} "
+                     f"The following was called (secrets excluded) {api_url}{uri_path}{data} "
                      f"The Error was {err=}, {type(err)=}")
         raise RuntimeError("Kraken Request was not executed. Read Logs for details.")
     return req
