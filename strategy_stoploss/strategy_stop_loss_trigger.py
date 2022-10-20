@@ -128,8 +128,10 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
 
     # Set std to minimum value
     std_min = cfg["trading"]["strategy"]["stop_loss"]["config"]["std_minimum_value"]
+    std_warning = "\n"
     if std <= std_min:
         logger.warning(f"Standard Deviation is below the minimum of {std_min}. Set Standard Deviation to {std_min}.")
+        std_warning = f"INFO: Standard Deviation of {std} below Minimum of {std_min}. Set to Minimum to avoid unnecessary trades.\n"
         std = std_min
 
     if position.current_std == 0:
@@ -142,6 +144,7 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     position.current_trade_price = last_trade_price
 
     print(f"--------> Stop Loss Calculation------->\n"
+          f"{std_warning}"
           f"Old Standard Deviation: {std_before} / New Standard Deviation: {std} / High Price: {high} {position.quote_currency} / Low Price: {low} {position.quote_currency} / Last Trade Price: {last_trade_price}"
           f"\n")
 
