@@ -41,7 +41,7 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
         if position.trigger > 0:
             logger.debug(f"{position.trigger=} > 0. Therefore old order")
 
-            # If the old trigger is higher then the new trigger it means the price has fallen. Therefore the trigger should not be moved.
+            # If the old trigger is higher than the new trigger it means the price has fallen. Therefore, the trigger should not be moved.
             # The new trigger becomes the old trigger
             new_trigger = high - std_before
             if position.trigger > new_trigger:
@@ -59,7 +59,7 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
             else:
                 logger.debug((f"Trigger was bigger then {last_trade_price=}. As this is a sell, position trigger will stay at {position.trigger=}"))
 
-        elif position.trigger == 0:  # This is the case where it does not has a trigger.
+        elif position.trigger == 0:  # This is the case where it does not have a trigger.
             logger.debug(f"{position.trigger=} == 0. Therefore there is no old order")
             position.trigger = high - std
             logger.debug(f"{position.trigger=} = {high=} - {std=}")
@@ -75,7 +75,7 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
         # Check if there was already a trigger
         if position.trigger > 0:
             logger.debug(f"{position.trigger=} > 0. Therefore old order")
-            # If the old trigger is lower then the new trigger it means the price has risen. Therefore the trigger should not be moved.
+            # If the old trigger is lower than the new trigger it means the price has risen. Therefore, the trigger should not be moved.
             # The new trigger becomes the old trigger
             new_trigger = low + std_before
             if position.trigger < new_trigger:
@@ -92,7 +92,7 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
             else:
                 logger.debug((f"Trigger was smaller then {last_trade_price=}. As this is a buy, position trigger will stay at {position.trigger=}"))
 
-        elif position.trigger == 0:  # This is the case where it does not has a trigger.
+        elif position.trigger == 0:  # This is the case where it does not have a trigger.
             logger.debug(f"{position.trigger=} == 0. Therefore there is no old order")
             position.trigger = low + std
             logger.debug(f"{position.trigger=} = {low=} + {std=}")
@@ -125,6 +125,13 @@ def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_hist
     # Collect two std's. The current and one period before. This way I can compare if the std has changed.
     df_ohlc_std = get_ohlc_dataframe(pair=position.exchange_currency_pair, interval=stdi)
     std = get_indicator_form_ohlc(df=df_ohlc_std, indicator="std", history_length=std_history)
+
+    # Set std to minimum value
+    std_min = cfg["trading"]["strategy"]["stop_loss"]["config"]["std_minimum_value"]
+    if std <= std_min:
+        logger.warning(f"Standard Deviation is below the minimum of {std_min}. Set Standard Deviation to {std_min}.")
+        std = std_min
+
     if position.current_std == 0:
         std_before = std
     else:
