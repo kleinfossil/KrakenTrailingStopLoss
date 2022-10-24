@@ -5,17 +5,17 @@ basic:
   pretty_waiting_time: 0 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
 
 trading:
-  supported_currencies: "XETHZEUR"
-  waiting_time: 600
-  position:
-    base_currency: "XETH"
-    quote_currency: "ZEUR"
+  supported_currencies: "XETHZEUR" # List of currency pairs which are supported by this trader
+  waiting_time: 600 # Time the trader will wait in seconds until the next trigger calculation
+  position: # This need to be improved as soon as there are more than one currency pair
+    base_currency: "XETH" # base currency name as per kraken
+    quote_currency: "ZEUR" # quote currency name as per kraken
   strategy: # 1 if this strategy is active. 0 if the strategy is inactive
     stop_loss:
-      active: 1
-      buy_price_offset: 1
-      sell_price_offset: 1
-      quote_currency_offset: 30
+      active: 1 # Set 0 to deactivate this strategy. Set to 1 to activate it
+      buy_price_offset: 1 # Amount in quote currency (e.g. Euro) which will offset the limit price from the trigger price. Means if the buy trigger is at 1000 it will buy at 1001 to ensure that the limit will be executed. This means the order behaves like a market order, but with the safety that if the price rises or falls to fast that an order will not (or just partially) be executed.
+      sell_price_offset: 1 # Amount in quote currency (e.g. Euro) which will offset the limit price from the trigger price. Means if the sell trigger is at 1000 it will sell at 999 to ensure that the limit will be executed. This means the order behaves like a market order, but with the safety that if the price rises or falls to fast that an order will not (or just partially) be executed.
+      quote_currency_offset: 30 # Amount in quote currency (e.g. Euro) which will be not traded. Means when the trader buys a new base currency, it will buy it minus the quote_currency_offset
       config:
         standard_deviation_interval: "d" # Interval used to calculate the standard deviation. d=days, h=hours, m=minutes
         standard_deviation_history: 10 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
@@ -49,20 +49,20 @@ kraken_private:
 
 kraken_trade:
   trade_requires_approval: 0 # 1 will have the trader wait for approval. 0 will not require a approval
-  order_type: stop-loss-limit
+  order_type: stop-loss-limit # Order Type as per Kraken
   allowed_decimals:
     XETHZEUR:
-      price_decimals: 2
-      volume_decimals: 8
+      price_decimals: 2 # Number of decimals after the "." as per kraken
+      volume_decimals: 8 # Number of decimals after the "." as per kraken
   minimum_order:
-    XETHZEUR: 0.001
+    XETHZEUR: 0.001 # Minimum order as per kraken
   fees:
-    maker: 0.0026
-    taker: 0.0016
+    maker: 0.0026 # fee as per kraken for market orders (or limit orders above (buy) or below (sell) current price)
+    taker: 0.0016 # fee for limit orders which are placed at the market first before executing.
   sleep_time_between_error_requests: 10 # Number of seconds to sleep in case Kraken does not respond on non-trading requests. Trading requests will always stop the program in case of an error.
   max_retries_error_requests: 5  # Number of times the program should try to retry a Kraken non-trading request. Trading requests (buy and sell) are never retried. Instead, if will through an error and stop the program.
 
-book:
-  till: "1629583200"
+book: # I should rename this ^^
+  till: "1629583200" # Time the reporting book will be execeuted.
 
 
