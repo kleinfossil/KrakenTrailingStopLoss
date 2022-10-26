@@ -17,8 +17,8 @@ trading:
       sell_price_offset: 1 # Amount in quote currency (e.g. Euro) which will offset the limit price from the trigger price. Means if the sell trigger is at 1000 it will sell at 999 to ensure that the limit will be executed. This means the order behaves like a market order, but with the safety that if the price rises or falls to fast that an order will not (or just partially) be executed.
       quote_currency_offset: 30 # Amount in quote currency (e.g. Euro) which will be not traded. Means when the trader buys a new base currency, it will buy it minus the quote_currency_offset
       config:
-        standard_deviation_interval: "d" # Interval used to calculate the standard deviation. d=days, h=hours, m=minutes
-        standard_deviation_history: 10 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
+        standard_deviation_interval: "h" # Interval used to calculate the standard deviation. d=days, h=hours, m=minutes
+        standard_deviation_history: 24 # how many epochs (days, hours, minutes) the standard deviation calculation should go back
         minmax_interval: "h" # Interval used to find the minimum or maximum value. d=days, h=hours, m=minutes
         minmax_history: 10 # How much history epochs should be used to find a minmax value.
         std_delta_min_difference: 2 # standard deviation difference between old and new. If the difference is smaller the delta will be set to 0
