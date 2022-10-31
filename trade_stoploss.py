@@ -1,5 +1,6 @@
 # This script implements the Stop Loss trading.
 import os
+import pickle
 import sys
 import traceback
 import argparse
@@ -23,8 +24,10 @@ from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from strategy_stoploss.trading import add_order, edit_order
 from strategy_stoploss.data_classes.global_data import set_google_secret, reset_google_secret
 from strategy_stoploss.helper_scripts.send_mail import send_error_mail
+from strategy_stoploss.backtest.manage_backtest_time import get_backtest_start_time_unix, set_backtest_starting_time
 import yaml
 from yaml.loader import SafeLoader
+
 
 with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
@@ -250,11 +253,13 @@ if __name__ == "__main__":
         quote = cfg["trading"]["position"]["quote_currency"]
         backtest = cfg["basic"]["backtest_active"]
 
+        backtest_starting_time = set_backtest_starting_time(backtest)
+
         # lock finish time
         time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
         logger.info(f" Trader will finish at Datetime: {trade_arguments.trading_time} / Unixtime: {time_till_finish}")
 
-        # std_change is a value which should be take over from trade to trade. Therefore it is defined outside the trading loop
+        # std_change is a value which should be take over from trade to trade. Therefore, it is defined outside the trading loop
         std_change: Decimal = Decimal(0)
 
         # Start trading
@@ -263,7 +268,13 @@ if __name__ == "__main__":
 
         i = 1
         while time_till_finish >= time.time():
-            current_time = convert_unix_time_to_datetime(time.time())
+            if backtest == 1:
+                with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'rb') as f:
+                    backtest_time = pickle.load(f)
+                current_time = convert_unix_time_to_datetime(int(backtest_time))
+            else:
+                current_time = convert_unix_time_to_datetime(time.time())
+
             print(f"_________> RUN {i} at {current_time} <_________")
             print("")
             logger.debug(f"Before trading: {std_change=}")

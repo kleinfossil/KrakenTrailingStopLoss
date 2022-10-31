@@ -8,7 +8,9 @@ main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
 os.chdir(main_dir_path)
 
 from strategy_stoploss.backtest.connect_kraken_private import get_account_balance, get_open_orders, trade_add_order, trade_edit_order
+from strategy_stoploss.backtest.connect_kraken_public import get_ohlc_json
 from strategy_stoploss.backtest.set_kraken_private import set_account_balance, set_open_order
+from strategy_stoploss.backtest.manage_backtest_time import get_backtest_start_time_unix, set_backtest_starting_time, set_backtest_forward, get_current_backtest_time_unix
 
 
 class TestBacktest(unittest.TestCase):
@@ -16,11 +18,11 @@ class TestBacktest(unittest.TestCase):
     # @unittest.skip('test_get_account_balance - Is not tested')
     def test_get_account_balance(self):
         response = get_account_balance("backtest")
-        test_value = {'error': [], 'result': {'XETH': '0.00', 'ZEUR': '0.00'}}
+        test_value = {'error': [], 'result': {'XETH': '0.00', 'ZEUR': '1000.00'}}
 
         self.assertEqual(response, test_value, f"Should be: {test_value}")
 
-        path = f"{main_dir_path}/strategy_stoploss/backtest/data/current_account_balance.pickle"
+        path = f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_account_balance.pickle"
         new_balance = {'XETH': '0.85676089', 'ZEUR': '27.00'}
         set_account_balance(path=path, balance_dict=new_balance)
         test_value = {'error': [], 'result': new_balance}
@@ -34,7 +36,7 @@ class TestBacktest(unittest.TestCase):
         test_value = {"error": [], "result": {"open": {}}}
         self.assertEqual(response, test_value, f"Should be: {test_value}")
 
-        path = f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.json"
+        path = f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_open_orders.json"
         # Order dict structure:
         # pair, type, price, price2, vol
         new_order = {"pair": "ETHEUR", "type": "sell", "price": "1338.06", "price2": "1337.06", "volume": "0.85676089"}
@@ -201,11 +203,36 @@ class TestBacktest(unittest.TestCase):
         open_orders_response = get_open_orders("backtest")
         self.assertEqual(open_orders_response, trade_response, f"Should be: {trade_response}")
 
+    def test_get_backtest_start_time_unix(self):
+        response = get_backtest_start_time_unix()
+        test_value = "1666662400"
+        self.assertEqual(response, test_value, f"Should be: {test_value}")
+
+    def test_set_backtest_starting_time(self):
+        response = set_backtest_starting_time(1)
+        test_value = 1666662400
+        self.assertEqual(response, test_value, f"Should be: {test_value}")
+
+        set_backtest_forward()
+        response = get_current_backtest_time_unix()
+        test_value = 1666663000
+        self.assertEqual(response, test_value, f"Should be: {test_value}")
+
+    def test_get_ohlc_json(self):
+        set_backtest_starting_time(1)
+        response = get_ohlc_json(pair="XETHZEUR", interval=1)
+        print(response)
+        set_backtest_forward()
+        response = get_ohlc_json(pair="XETHZEUR", interval=1)
+        print(response)
+
     @classmethod
     def tearDownClass(cls):
-        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_account_balance.pickle")
-        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.json")
-        print("done")
+        print("Cleanup if applicable.")
+        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_account_balance.pickle")
+        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_open_orders.json")
+        clean_up(f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle")
+        print("Cleanup done.")
 
 
 def clean_up(path):

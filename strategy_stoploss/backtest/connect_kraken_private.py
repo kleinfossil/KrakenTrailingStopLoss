@@ -33,13 +33,13 @@ def get_account_balance(key_type="backtest"):
 
     # Check if there is already a balance. If not create it from config.
     try:
-        with open(f'{dir_path}/data/{filename}', 'rb') as handle:
+        with open(f'{dir_path}/runtime_data/{filename}', 'rb') as handle:
             balance_dict = pickle.load(handle)
     except FileNotFoundError:
         logger.debug(f"{filename} not found. Create it now.")
         balance_dict = {cfg["backtest"]["start_base_currency"]: cfg["backtest"]["start_base_volume"],
                         cfg["backtest"]["start_quote_currency"]: cfg["backtest"]["start_quote_volume"]}
-        with open(f'{dir_path}/data/{filename}', 'wb') as handle:
+        with open(f'{dir_path}/runtime_data/{filename}', 'wb') as handle:
             pickle.dump(balance_dict, handle)
 
     json_response["result"] = balance_dict
@@ -48,31 +48,23 @@ def get_account_balance(key_type="backtest"):
 
 
 def get_open_orders(key_type="backtest"):
-    # Get open Orders
-
-    # Create the dict structure as per kraken
+    # Get open Orders from local current_open_orders.json
 
     filename = "current_open_orders.json"
 
     try:
-        with open(f'{dir_path}/data/{filename}', 'r') as handle:
+        with open(f'{dir_path}/runtime_data/{filename}', 'r') as handle:
             json_response = json.load(handle)
     except FileNotFoundError:
         # Creates a new file with initial values
-        logger.debug(f"{filename} not found. Create it now.")
-        initial_open_order_json_path = "strategy_stoploss/backtest/initial_content/initial_open_order.json"
-        with open(initial_open_order_json_path, "r") as jsonFile:
-            json_response = json.load(jsonFile)
-            with open(f'{dir_path}/data/{filename}', 'w') as handle:
-                json.dump(json_response, handle)
-
-        # Sets the json response to look like an empty response.
-        # This way the pickle already has the full response structure while the response of the function looks the same as for kraken
+        logger.debug(f"{filename} not found. Create it now with empty orders.")
         json_response = {'error': [],
                          'result': {
                              'open':
                                  {}
                          }}
+        with open(f'{dir_path}/runtime_data/{filename}', 'w') as handle:
+            json.dump(json_response, handle)
 
     return json_response
 
@@ -82,10 +74,9 @@ def trade_add_order(trade_dict, key_type):
 
     # Make sure that a current_open_orders.json file exists by just opening it.
     # If it exists it will do nothing, if it does not exist it will create on
-    get_open_orders("backtest")
 
     # Set the open order with new trade dict value
-    path = f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.json"
+    path = f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_open_orders.json"
     set_open_order(path=path, order_dict=trade_dict)
 
     # Call get_open_orders() again. Now with updated values

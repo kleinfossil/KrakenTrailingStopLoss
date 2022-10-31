@@ -21,9 +21,9 @@ def convert_unix_time_to_datetime(unix_time):
     return str(date_and_time)
 
 
-def convert_datetime_to_unix_time(date_time):
+def convert_datetime_to_unix_time(date_time, time_format="%Y-%m-%dT%H:%M:%S%z"):
     # Converts datetime to a unix time stamp
-    d = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S%z')
+    d = datetime.datetime.strptime(date_time, time_format)
     unix_time = time.mktime(d.timetuple())
     return unix_time
 
