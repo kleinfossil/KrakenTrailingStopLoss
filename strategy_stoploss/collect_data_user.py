@@ -1,9 +1,22 @@
 # Manages user related date on Kraken
-
-from strategy_stoploss.connect_kraken_private import get_account_balance, get_open_orders
 from strategy_stoploss.connect_kraken_public import get_asset_pairs
 from strategy_stoploss.helper_scripts.helper import get_logger
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
+
 logger = get_logger("stoploss_logger")
+
+if cfg["basic"]["backtest_active"] == 0:
+    logger.debug("Backtest inactive. Using market data")
+    from strategy_stoploss.connect_kraken_private import get_account_balance, get_open_orders
+elif cfg["basic"]["backtest_active"] == 1:
+    logger.debug("Backtest active. Using backtest data")
+    from strategy_stoploss.backtest.connect_kraken_private import get_account_balance, get_open_orders
+else:
+    raise RuntimeError(f"Backtest configuration contains wrong value. Must be '1' or '0'. Value was {cfg['basic']['backtest_active']}")
 
 
 def resolve_three_character_currency_to_kraken_currency(exchange_currency_pair):

@@ -248,6 +248,7 @@ if __name__ == "__main__":
         logger.info("Program ready to trade")
         base = cfg["trading"]["position"]["base_currency"]
         quote = cfg["trading"]["position"]["quote_currency"]
+        backtest = cfg["basic"]["backtest_active"]
 
         # lock finish time
         time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)

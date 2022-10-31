@@ -1,12 +1,11 @@
 # This script prepares the trading date so that it can be handed over to a market like kraken.
 import time
 from decimal import Decimal
-
-from strategy_stoploss.connect_kraken_private import get_closed_orders
 from strategy_stoploss.helper_scripts.helper import get_logger
 from strategy_stoploss.data_classes.kraken_data_classes import AddTrade, EditOrder
 from strategy_stoploss.execute_kraken_add_edit_cancel import execute_order
 from strategy_stoploss.helper_scripts.format_terminal import bcolors as coloring
+from strategy_stoploss.connect_kraken_private import get_closed_orders
 import yaml
 from yaml.loader import SafeLoader
 

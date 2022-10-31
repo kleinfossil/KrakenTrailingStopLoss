@@ -3,6 +3,7 @@ basic:
   mail_key_file_location: "key_files/mail_info.yml"
   logs-location: "logs/"
   pretty_waiting_time: 0 # 1 will activate the pretty waiting time. However, this could create errors e.g. in a terminal based environment as it will continuously write print statements.
+  backtest_active: 0 # 1 will set the backtest active. In this case all connect_kraken_private/public will use backtest functions. Also, the program will not sleep and market data will come from a time and sales file which need to be prepared upfront.cfg
 
 trading:
   supported_currencies: "XETHZEUR" # List of currency pairs which are supported by this trader

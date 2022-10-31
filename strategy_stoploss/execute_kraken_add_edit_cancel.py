@@ -1,7 +1,6 @@
 # Manages the Orders of the Traders. This script can be seen as the Orchestrator for every Kraken Order
 
 from strategy_stoploss.helper_scripts.helper import get_logger
-from strategy_stoploss.connect_kraken_private import get_secrets, trade_add_order, trade_edit_order
 from strategy_stoploss.checks_trade import check_order
 from test.fake_data.fake_data_user import fake_trade_response_data
 import yaml
@@ -11,6 +10,15 @@ with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 logger = get_logger("stoploss_logger")
+
+if cfg["basic"]["backtest_active"] == 0:
+    logger.debug("Backtest inactive. Using market data")
+    from strategy_stoploss.connect_kraken_private import trade_add_order, trade_edit_order
+elif cfg["basic"]["backtest_active"] == 1:
+    logger.debug("Backtest active. Using backtest data")
+    from strategy_stoploss.backtest.connect_kraken_private import trade_add_order, trade_edit_order
+else:
+    raise RuntimeError(f"Backtest configuration contains wrong value. Must be '1' or '0'. Value was {cfg['basic']['backtest_active']}")
 
 
 def execute_order(trade_variable):
