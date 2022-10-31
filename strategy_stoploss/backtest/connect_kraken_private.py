@@ -1,3 +1,6 @@
+# BACKTEST!
+# This is the backtest version of connect kraken private.
+
 import json
 
 import pandas as pd
@@ -5,6 +8,7 @@ import os
 from decimal import Decimal
 import pickle
 
+from strategy_stoploss.backtest.set_kraken_private import set_open_order
 from strategy_stoploss.helper_scripts.helper import get_logger
 import yaml
 from yaml.loader import SafeLoader
@@ -15,6 +19,7 @@ with open("strategy_stoploss/backtest/backtest_config.yml", "r") as yml_file:
 logger = get_logger("backtest_logger")
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
 
 
 def get_account_balance(key_type="backtest"):
@@ -74,11 +79,26 @@ def get_open_orders(key_type="backtest"):
 
 def trade_add_order(trade_dict, key_type):
     # Creates a new order on kraken
-    json_response = {}
+
+    # Make sure that a current_open_orders.json file exists by just opening it.
+    # If it exists it will do nothing, if it does not exist it will create on
+    get_open_orders("backtest")
+
+    # Set the open order with new trade dict value
+    path = f"{main_dir_path}/strategy_stoploss/backtest/data/current_open_orders.json"
+    set_open_order(path=path, order_dict=trade_dict)
+
+    # Call get_open_orders() again. Now with updated values
+    json_response = get_open_orders("backtest")
+
     return json_response, True
 
 
 def trade_edit_order(trade_dict, key_type):
     # Edits a Order
-    json_response = {}
-    return json_response, True
+
+    # As for a backtest there is no difference between edit and edit (as the difference is just a different kraken API, but the result is the same)
+    # the trade_edit_order() just calls trade_add_order()
+    # This behavior only works as long as there is just one open order. As soon as there are more, the edit order would need to search for the correct order by order ID
+    json_response, trade_check = trade_add_order(trade_dict, key_type)
+    return json_response, trade_check

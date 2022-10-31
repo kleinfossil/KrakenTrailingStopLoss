@@ -29,8 +29,8 @@ def get_open_orders_for_currency_pair(exchange_currency_pair):
     # Returns currently open Orders
 
     # Kraken changes the currency pairs when I get open orders.
-    # Therefore there is a hardcoded mapping implemented here.
-    # If more then one currency pair should be supported it need to be changed here.
+    # Therefore, there is a hardcoded mapping implemented here.
+    # If more than one currency pair should be supported it need to be changed here.
     match exchange_currency_pair:
         case "ZETHXEUR": exchange_currency_pair = "ETHEUR"
 

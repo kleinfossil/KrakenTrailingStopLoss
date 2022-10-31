@@ -22,11 +22,10 @@ def set_open_order(path, order_dict):
 
     with open(f'{path}', 'r') as handle:
         order = json.load(handle)
-    order["result"]["open"]["OUN3AM-4Y5QV-UJPT7M"]["descr"]["pair"] = order_dict["pair"]
-    order["result"]["open"]["OUN3AM-4Y5QV-UJPT7M"]["descr"]["type"] = order_dict["type"]
-    order["result"]["open"]["OUN3AM-4Y5QV-UJPT7M"]["descr"]["price"] = order_dict["price"]
-    order["result"]["open"]["OUN3AM-4Y5QV-UJPT7M"]["descr"]["price2"] = order_dict["price2"]
-    order["result"]["open"]["OUN3AM-4Y5QV-UJPT7M"]["vol"] = order_dict["vol"]
+    order["result"]["open"]["KAS3AM-4Y5QV-UJPT7M"]["descr"]["type"] = order_dict["type"]
+    order["result"]["open"]["KAS3AM-4Y5QV-UJPT7M"]["descr"]["price"] = order_dict["price"]
+    order["result"]["open"]["KAS3AM-4Y5QV-UJPT7M"]["descr"]["price2"] = order_dict["price2"]
+    order["result"]["open"]["KAS3AM-4Y5QV-UJPT7M"]["vol"] = order_dict["volume"]
     with open(f'{path}', 'w') as handle:
         json.dump(order, handle, indent=4)
 

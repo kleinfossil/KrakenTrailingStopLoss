@@ -70,7 +70,7 @@ def test_get_positive_negative_trading():
 
 if __name__ == "__main__":
     #test_query_order_info()
-    #test_get_open_orders()
+    test_get_open_orders()
 
     # test_get_closed_orders()
     #test_get_only_ETH_tx()
@@ -78,6 +78,6 @@ if __name__ == "__main__":
     # test_trades_and_trade()
 
     # test_set_google_secrets()
-    test_get_positive_negative_trading()
+    # test_get_positive_negative_trading()
 
     print("Test done")
