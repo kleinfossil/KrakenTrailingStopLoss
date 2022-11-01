@@ -41,6 +41,7 @@ def get_ohlc_json(pair, interval=1, since=0):
     except FileNotFoundError:
         # If not create an OHLC table based on the ts table provided and save it so that it is not needed to be created again
         ohlc_df = create_ohlc_df(interval=int(interval), path=ts_path)
+        ohlc_df = clean_nan_values(ohlc_df)
         save_ohlc_data(ohlc_df=ohlc_df, interval=interval)
         ohlc_df = pd.read_csv(f"{ohlc_path}")
 
@@ -92,7 +93,6 @@ def get_ohlc_as_json(ohlc_df, pair, start, number_of_values=720):
     number_of_values = int(number_of_values)
     limited_ohlc = ohlc_df.loc[ohlc_df["Date"] >= start]
     limited_ohlc = limited_ohlc.iloc[0:number_of_values]
-    limited_ohlc = clean_nan_values(limited_ohlc)
 
     # First create the basic template for the response dict
     response_dict = {"error": [],
@@ -119,10 +119,13 @@ def get_ohlc_as_json(ohlc_df, pair, start, number_of_values=720):
 def clean_nan_values(ohlc_df):
     # Sometimes in a timeframe of the OHLC no trade happened. In this case numpy will just write NaN values. Instead, the NaN values should be filled with the last close value
     print(ohlc_df)
+    # ohlc_df["Open"], ohlc_df["High"], ohlc_df["Low"], ohlc_df["Close"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Open"))
     ohlc_df["Open"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Open"))
-    ohlc_df["High"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="High"))
-    ohlc_df["Low"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Low"))
-    ohlc_df["Close"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Close"))
+    #ohlc_df["Open"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Open"))
+    #ohlc_df["High"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="High"))
+    #ohlc_df["Low"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Low"))
+    #ohlc_df["Close"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Close"))
+    print(ohlc_df)
     ohlc_df = ohlc_df.dropna(how='any')
     return ohlc_df
 
@@ -133,6 +136,10 @@ def replace_with_last_close(ohlc_df, date, column):
 
     # Select the value in this specific column and row
     value = ohlc_df.loc[ohlc_df["Date"] == date][column].item()
+    str_date = str(date)
+
+    if str_date == "2022-10-24 00:42:00":
+        print("bla")
 
     # Check if this is a NaN value
     if math.isnan(value):
@@ -160,7 +167,8 @@ def replace_with_last_close(ohlc_df, date, column):
                     else:
                         # If it is not NaN then select the close value as this will be added into every column (independent if is high, low or open).
                         close_value = ohlc_df.iloc[below_index]["Close"]
-                        return close_value
+                        return_value = [close_value, close_value, close_value, close_value]
+                        return return_value
             else:
                 # If reached the first value return the NaN which will be dropped later.
                 return value
@@ -171,8 +179,6 @@ def replace_with_last_close(ohlc_df, date, column):
     # Returns the value if it is not NaN. In this case nothing changes.
     else:
         return value
-
-
 
 
 def save_ohlc_data(ohlc_df, interval):
