@@ -244,35 +244,43 @@ def open_ts_table(path):
 def get_ticker(pair):
     # Gets the latest ticket
     """ General Structure
-    {'XETHZEUR':
-        {
-            'a': ['1606.66000', '3', '3.000'],          Ask [<price>, <whole lot volume>, <lot volume>]
-            'b': ['1606.37000', '1', '1.000'],          Bid [<price>, <whole lot volume>, <lot volume>]
-            'c': ['1606.66000', '0.00061321'],          Last trade closed [<price>, <lot volume>]
-            'v': ['3450.71273470', '8677.89702142'],    Volume [<today>, <last 24 hours>]
-            'p': ['1605.45723', '1593.94790'],          Volume weighted average price [<today>, <last 24 hours>]
-            't': [8469, 28773],                         Number of trades [<today>, <last 24 hours>]
-            'l': ['1586.56000', '1565.16000'],          Low [<today>, <last 24 hours>]
-            'h': ['1624.29000', '1638.33000'],          High [<today>, <last 24 hours>]
-            'o': '1591.22000'                           Today's opening price
+    {"error":[],
+        "result":
+        {'XETHZEUR':
+            {
+                'a': ['1606.66000', '3', '3.000'],          Ask [<price>, <whole lot volume>, <lot volume>]
+                'b': ['1606.37000', '1', '1.000'],          Bid [<price>, <whole lot volume>, <lot volume>]
+                'c': ['1606.66000', '0.00061321'],          Last trade closed [<price>, <lot volume>]
+                'v': ['3450.71273470', '8677.89702142'],    Volume [<today>, <last 24 hours>]
+                'p': ['1605.45723', '1593.94790'],          Volume weighted average price [<today>, <last 24 hours>]
+                't': [8469, 28773],                         Number of trades [<today>, <last 24 hours>]
+                'l': ['1586.56000', '1565.16000'],          Low [<today>, <last 24 hours>]
+                'h': ['1624.29000', '1638.33000'],          High [<today>, <last 24 hours>]
+                'o': '1591.22000'                           Today's opening price
+            }
         }
-    }
     """
     # The Backtest will just mock the closing price for now. All other values will be set to 0
     # First create the basic template for the response dict
     response_dict = {
-        pair:
-            {'a': ['0.00', '0', '0.00'],
-             'b': ['0.00', '0', '0.00'],
-             'c': ['0.00', '0.00'],
-             'v': ['0.00', '0.00'],
-             'p': ['0.00', '0.00'],
-             't': [0.00, 0.00],
-             'l': ['0.00', '0.00'],
-             'h': ['0.00', '0.00'],
-             'o': '0.00'
-             }
-    }
+        "error": [],
+        "result": {
+            pair:
+                {'a': ['0.00', '0', '0.00'],
+                 'b': ['0.00', '0', '0.00'],
+                 'c': ['0.00', '0.00'],
+                 'v': ['0.00', '0.00'],
+                 'p': ['0.00', '0.00'],
+                 't': [0.00, 0.00],
+                 'l': ['0.00', '0.00'],
+                 'h': ['0.00', '0.00'],
+                 'o': '0.00'
+                 }
+            }
+        }
+
+
+
     backtest_time = get_current_backtest_time_unix()
 
     # Open ts-table
@@ -291,7 +299,7 @@ def get_ticker(pair):
     except AttributeError:
         last_trade_closed_price = trades_earlier_than_backtest_time["Price"]
 
-    response_dict[pair]["c"] = [str(last_trade_closed_price), '0.00']
+    response_dict["result"][pair]["c"] = [str(last_trade_closed_price), '0.00']
 
     # I am dumping it once into json to ensure that the structure is correct
     json_response = json.dumps(response_dict)

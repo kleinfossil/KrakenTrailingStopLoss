@@ -1,15 +1,27 @@
 # Script functions which extract and transform data
 import traceback
 import pandas as pd
-from strategy_stoploss.connect_kraken_public import (
-    get_ohlc_json,
-    get_ticker)
+
+
 from strategy_stoploss.helper_scripts.helper import (
     convert_unix_time_to_datetime,
     get_stdev,
     get_logger)
 
+import yaml
+from yaml.loader import SafeLoader
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
+
 logger = get_logger("stoploss_logger")
+
+if cfg["basic"]["backtest_active"] == 0:
+    from strategy_stoploss.connect_kraken_public import get_ohlc_json, get_ticker
+elif cfg["basic"]["backtest_active"] == 1:
+    from strategy_stoploss.backtest.connect_kraken_public import get_ohlc_json, get_ticker
+else:
+    raise RuntimeError(f"Backtest configuration contains wrong value. Must be '1' or '0'. Value was {cfg['basic']['backtest_active']}")
 
 
 def get_ohlc_dataframe(pair, interval):

@@ -12,10 +12,10 @@ with open("trader_config.yml", "r") as yml_file:
 with open("strategy_stoploss/backtest/backtest_config.yml", "r") as yml_file:
     backtest_cfg = yaml.load(yml_file, Loader=SafeLoader)
 
-logger = get_logger("stoploss_logger")
+logger = get_logger("backtest_logger")
 
 
-def get_backtest_start_time_unix():
+def get_backtest_start_time_unix(backtest_status):
     return int(backtest_cfg["backtest"]["timeframe"])
 
 
@@ -31,7 +31,7 @@ def get_current_backtest_time_unix():
 def set_backtest_starting_time(backtest_status):
     if backtest_status == 1:
         logger.debug("Backtest is active")
-        backtest_starting_time = get_backtest_start_time_unix()
+        backtest_starting_time = get_backtest_start_time_unix(backtest_status)
         try:
             with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'wb') as f:
                 pickle.dump(backtest_starting_time, f)

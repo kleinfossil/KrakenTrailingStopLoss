@@ -1,13 +1,20 @@
 # This script implements the Stop Loss trading.
 import os
-import pickle
+
+from strategy_stoploss.backtest.helper_backtest import clean_backtest_runtime_data
+
+# Before I can import anything from this project I need to make sure that I am working always at the top directory no matter from I start this script
+# The following will change the working directory to \StopLoss\
+dir_path = os.path.dirname(os.path.realpath(__file__))
+main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
+os.chdir(main_dir_path)
+
 import sys
 import traceback
 import argparse
 import time
 from decimal import Decimal
 from datetime import datetime, timedelta
-
 from strategy_stoploss.helper_scripts.google_secretmanager import get_key_and_secret_from_google
 from strategy_stoploss.helper_scripts.helper import (
     get_logger,
@@ -24,10 +31,9 @@ from test.fake_data.fake_data_user import fake_get_account_balance_per_currency
 from strategy_stoploss.trading import add_order, edit_order
 from strategy_stoploss.data_classes.global_data import set_google_secret, reset_google_secret
 from strategy_stoploss.helper_scripts.send_mail import send_error_mail
-from strategy_stoploss.backtest.manage_backtest_time import get_backtest_start_time_unix, set_backtest_starting_time
+from strategy_stoploss.backtest.manage_backtest_time import get_backtest_start_time_unix, set_backtest_starting_time, get_current_backtest_time_unix, set_backtest_forward
 import yaml
 from yaml.loader import SafeLoader
-
 
 with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
@@ -132,6 +138,8 @@ def init_program():
 def post_program():
     # Will be used in future for post processing at the point cronjobs are implemented
     reset_google_secret()
+    if backtest == 1:
+        clean_backtest_runtime_data()
 
 
 def init_trader():
@@ -251,9 +259,13 @@ if __name__ == "__main__":
         logger.info("Program ready to trade")
         base = cfg["trading"]["position"]["base_currency"]
         quote = cfg["trading"]["position"]["quote_currency"]
-        backtest = cfg["basic"]["backtest_active"]
 
+        # Backtests allow the program to run with data from file instead using the market API.
+        backtest = cfg["basic"]["backtest_active"]
         backtest_starting_time = set_backtest_starting_time(backtest)
+        backtest_time = backtest_starting_time
+        if backtest == 1:
+            clean_backtest_runtime_data()
 
         # lock finish time
         time_till_finish = convert_datetime_to_unix_time(trade_arguments.trading_time)
@@ -268,29 +280,39 @@ if __name__ == "__main__":
 
         i = 1
         while time_till_finish >= time.time():
+
+            # Checks if a backtest is active. If yes it will load the current backtest time.
+            backtest_text = ""
             if backtest == 1:
                 with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'rb') as f:
-                    backtest_time = get_backtest_start_time_unix()
+                    backtest_time = get_current_backtest_time_unix()
                 current_time = convert_unix_time_to_datetime(int(backtest_time))
+                backtest_text = "BACKTEST ACTIVE"
             else:
                 current_time = convert_unix_time_to_datetime(time.time())
 
-            print(f"_________> RUN {i} at {current_time} <_________")
+            print(f"_________> RUN {i} at {current_time} {backtest_text}<_________")
             print("")
+
             logger.debug(f"Before trading: {std_change=}")
             traded_position = trade_position(base_currency=base, quote_currency=quote, current_std=std_change)
             std_change = traded_position.current_std
             logger.debug(f"After trading: {std_change=}")
 
             post_trade(traded_position)
+
             now = datetime.now()
             next_execution = now + timedelta(seconds=cfg["trading"]["waiting_time"])
             print(f"It is now: {now} -> Wait {cfg['trading']['waiting_time']} Seconds -> Next Execution: {next_execution}")
-            if cfg["basic"]["pretty_waiting_time"] == 1:
-                pretty_waiting_time(cfg["trading"]["waiting_time"])
-            else:
-                logger.debug("Pretty Waiting Time is deactivated.")
-                time.sleep(cfg["trading"]["waiting_time"])
+            if backtest == 0:
+                if cfg["basic"]["pretty_waiting_time"] == 1:
+                    pretty_waiting_time(cfg["trading"]["waiting_time"])
+                else:
+                    logger.debug("Pretty Waiting Time is deactivated.")
+                    time.sleep(cfg["trading"]["waiting_time"])
+            elif backtest == 1:
+                logger.debug(f"Running backtest. Set new Backtest Time {cfg['trading']['waiting_time']} Seconds forward")
+                set_backtest_forward()
             i += 1
 
         post_program()

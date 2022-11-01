@@ -13,10 +13,8 @@ with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 if cfg["basic"]["backtest_active"] == 0:
-    logger.debug("Backtest inactive. Using market data")
     from strategy_stoploss.connect_kraken_private import get_open_orders
 elif cfg["basic"]["backtest_active"] == 1:
-    logger.debug("Backtest active. Using backtest data")
     from strategy_stoploss.backtest.connect_kraken_private import get_open_orders
 else:
     raise RuntimeError(f"Backtest configuration contains wrong value. Must be '1' or '0'. Value was {cfg['basic']['backtest_active']}")
