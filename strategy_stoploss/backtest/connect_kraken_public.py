@@ -123,31 +123,52 @@ def clean_nan_values(ohlc_df):
     ohlc_df["High"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="High"))
     ohlc_df["Low"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Low"))
     ohlc_df["Close"] = ohlc_df["Date"].apply(lambda x: replace_with_last_close(ohlc_df, x, column="Close"))
-    print(ohlc_df)
     ohlc_df = ohlc_df.dropna(how='any')
-    print(ohlc_df)
+    return ohlc_df
 
 
 def replace_with_last_close(ohlc_df, date, column):
+    # Checks if there is a NaN value in the column. If yes it will replace this value with a former close value
+    # This function will go through every row. So selecting an item will always respond with the value of the current row
+
+    # Select the value in this specific column and row
     value = ohlc_df.loc[ohlc_df["Date"] == date][column].item()
+
+    # Check if this is a NaN value
     if math.isnan(value):
+
+        # Find the date related to this NaN value
         index_nan = int(ohlc_df.loc[ohlc_df["Date"] == date].index[0])
+
+        # Find the index of this value
         idx = ohlc_df.index.get_loc(index_nan)
         try:
+            # select the row below this index
             below_index = idx-1
+
+            # Check if the index is below 0. In this case it will just return this current NaN value. This value will be dropped later
             if below_index >= 0:
+
+                # It is possible that the below value is also an NaN. In this case it should go even further to look for a non-NaN value.
                 while below_index >= 0:
+
+                    # Select the value to check if it is NaN
                     below_value = ohlc_df.iloc[below_index][column]
                     if math.isnan(below_value):
+                        # If it is NaN then just set the index one below
                         below_index = below_index-1
                     else:
-                        return below_value
+                        # If it is not NaN then select the close value as this will be added into every column (independent if is high, low or open).
+                        close_value = ohlc_df.iloc[below_index]["Close"]
+                        return close_value
             else:
+                # If reached the first value return the NaN which will be dropped later.
                 return value
 
         except RuntimeError as e:
             logger.error(traceback, e)
             exit(1)
+    # Returns the value if it is not NaN. In this case nothing changes.
     else:
         return value
 
