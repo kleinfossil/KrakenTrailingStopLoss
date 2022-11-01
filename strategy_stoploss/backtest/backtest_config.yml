@@ -1,7 +1,8 @@
 backtest:
-  timeframe: "1666662400" # Timestamp in the past from when the backtest should start
+  timeframe: "1666562400" # Timestamp in the past from when the backtest should start
   start_base_currency: "XETH"
   start_base_volume: "0.00"
   start_quote_currency: "ZEUR"
   start_quote_volume: "1000.00"
   ts_table_name: "1666562400_ts_table.csv"
+  ohlc_values_per_response_on_kraken: 720

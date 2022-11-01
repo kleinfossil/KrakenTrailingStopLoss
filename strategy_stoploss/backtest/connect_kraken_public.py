@@ -45,7 +45,8 @@ def get_ohlc_json(pair, interval=1, since=0):
         save_ohlc_data(ohlc_df=ohlc_df, interval=interval)
         ohlc_df = pd.read_csv(f"{ohlc_path}")
 
-    json_response = get_ohlc_as_json(ohlc_df=ohlc_df, pair=pair, start=backtest_time, number_of_values=720)
+    number_of_values = int(cfg["backtest"]["ohlc_values_per_response_on_kraken"])
+    json_response = get_ohlc_as_json(ohlc_df=ohlc_df, pair=pair, start=backtest_time, number_of_values=number_of_values)
 
     return json_response
 
@@ -114,9 +115,10 @@ def get_ohlc_as_json(ohlc_df, pair, start, number_of_values=720):
     response_dict["result"][pair] = value_list
     response_dict["result"]["last"] = str(limited_ohlc["Date"].iloc[-1])
 
+    # I am dumping it once into json to ensure that the structure is correct
     json_response = json.dumps(response_dict)
-
-    return json_response
+    # Then load it again, so that it is not a string but a dict.
+    return json.loads(json_response)
 
 
 def clean_nan_values(ohlc_df):

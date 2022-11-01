@@ -9,6 +9,16 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
 os.chdir(main_dir_path)
 
+import yaml
+from yaml.loader import SafeLoader
+
+
+with open("trader_config.yml", "r") as yml_file:
+    cfg = yaml.load(yml_file, Loader=SafeLoader)
+
+with open("strategy_stoploss/backtest/backtest_config.yml", "r") as yml_file:
+    backtest_cfg = yaml.load(yml_file, Loader=SafeLoader)
+
 from strategy_stoploss.backtest.connect_kraken_private import get_account_balance, get_open_orders, trade_add_order, trade_edit_order
 from strategy_stoploss.backtest.connect_kraken_public import get_ohlc_json
 from strategy_stoploss.backtest.set_kraken_private import set_account_balance, set_open_order
@@ -224,11 +234,24 @@ class TestBacktest(unittest.TestCase):
         set_backtest_starting_time(1)
         response = get_ohlc_json(pair="XETHZEUR", interval=1)
         ohlc_df = transform_ohlc_json_to_ohlc_dataframe(json_data=response, api_symbol="XETHZEUR")
-
+        first_date = ohlc_df["Date"].iloc[0]
+        last_date = ohlc_df["Date"].iloc[-1]
+        lenght =  len(ohlc_df)
 
         set_backtest_forward()
         response = get_ohlc_json(pair="XETHZEUR", interval=1)
-        print(response)
+        ohlc_df_two = transform_ohlc_json_to_ohlc_dataframe(json_data=response, api_symbol="XETHZEUR")
+
+        next_check_in_sec = int(cfg["trading"]["waiting_time"])
+        first_date_two = ohlc_df_two ["Date"].iloc[0]
+        last_date_two = ohlc_df_two ["Date"].iloc[-1]
+        lenght_two = len(ohlc_df_two)
+        # Check if there are an NaN Values in it
+        self.assertTrue(not ohlc_df.isnull().values.any())
+        moved = str(int(first_date) + next_check_in_sec)
+        # self.assertEqual(ohlc_df["Date"].loc[moved].index(), ohlc_df["Date"].loc[first_date_two].index(), "Date not moved correctly")
+        self.assertEqual(lenght_two, lenght, "both ohlc have not the same lenght")
+        self.assertEqual(lenght_two, int(backtest_cfg["backtest"]["ohlc_values_per_response_on_kraken"]))
 
     @classmethod
     def tearDownClass(cls):
