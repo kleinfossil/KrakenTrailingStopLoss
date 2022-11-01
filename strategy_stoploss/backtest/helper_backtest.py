@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from strategy_stoploss.backtest.set_kraken_private import set_account_balance
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
 os.chdir(main_dir_path)
@@ -92,6 +94,8 @@ def post_trade_backtest(position):
                 new_quote = float(account_balance[cfg["backtest"]["start_quote_currency"]]) - (new_base*float(orders[0]["descr"]["price"]))
                 account_balance[cfg["backtest"]["start_base_currency"]] = new_base
                 account_balance[cfg["backtest"]["start_quote_currency"]] = new_quote
+                path = f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_account_balance.pickle"
+                set_account_balance(path=path, balance_dict=account_balance)
         elif (orders[0]["descr"]["type"] == "sell") & (orders[0]["descr"]["ordertype"] == "stop-loss_limit"):
             if last_ohlc["Low"] <= float(orders[0]["descr"]["price2"]):
                 clean_up(f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_open_orders.json")
@@ -100,7 +104,8 @@ def post_trade_backtest(position):
                 new_quote = 0.00
                 account_balance[cfg["backtest"]["start_base_currency"]] = new_base
                 account_balance[cfg["backtest"]["start_quote_currency"]] = new_quote
-
+                path = f"{main_dir_path}/strategy_stoploss/backtest/runtime_data/current_account_balance.pickle"
+                set_account_balance(path=path, balance_dict=account_balance)
     else:
         raise RuntimeError("Backtest Order is larger then 1. Currently just one order supported")
 
