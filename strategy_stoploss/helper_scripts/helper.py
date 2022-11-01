@@ -1,6 +1,7 @@
 # Script functions which are generic and not specific to this project
 import math
 import datetime
+import os
 import pickle
 import time
 import logging
@@ -10,6 +11,10 @@ from tqdm import tqdm
 from strategy_stoploss.helper_scripts.formated_logger import CustomFormatter
 import yaml
 from yaml.loader import SafeLoader
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+main_dir_path = f"{dir_path.split('StopLoss')[0]}StopLoss"
+os.chdir(main_dir_path)
 
 with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)

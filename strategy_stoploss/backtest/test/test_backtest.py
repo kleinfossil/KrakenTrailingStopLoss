@@ -1,6 +1,8 @@
 import unittest
 import os
 
+from strategy_stoploss.collect_data_market import transform_ohlc_json_to_ohlc_dataframe
+
 # Before I can import anything from this project I need to make sure that I am working at the same directory as the function I want to test
 # The following will change the working directory to \StopLoss\
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -221,7 +223,9 @@ class TestBacktest(unittest.TestCase):
     def test_get_ohlc_json(self):
         set_backtest_starting_time(1)
         response = get_ohlc_json(pair="XETHZEUR", interval=1)
-        print(response)
+        ohlc_df = transform_ohlc_json_to_ohlc_dataframe(json_data=response, api_symbol="XETHZEUR")
+
+
         set_backtest_forward()
         response = get_ohlc_json(pair="XETHZEUR", interval=1)
         print(response)
