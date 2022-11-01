@@ -10,11 +10,13 @@ from yaml.loader import SafeLoader
 
 from strategy_stoploss.helper_scripts.helper import convert_datetime_to_unix_time
 from strategy_stoploss.helper_scripts.helper import get_logger
+from strategy_stoploss.backtest.manage_backtest_time import get_current_backtest_time_unix
 
 with open("strategy_stoploss/backtest/backtest_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
 logger = get_logger("backtest_logger")
+
 
 
 def get_ohlc_json(pair, interval=1, since=0):
@@ -25,33 +27,35 @@ def get_ohlc_json(pair, interval=1, since=0):
         raise RuntimeError(f"Currently Backtest does not support 'since' in OHLC Data. Therefore this field must be '0 but it was {since}")
 
     # Get current active time
-    try:
-        with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'rb') as f:
-            backtest_time = pickle.load(f)
-    except FileNotFoundError as e:
-        logger.error(traceback, e)
-        exit(1)
+    backtest_time = get_current_backtest_time_unix()
 
-    # Check if I have an OHLC table for this interval
+    # get OHLC from file
     bt_starting_time = cfg["backtest"]["timeframe"]
     ohlc_path = f"strategy_stoploss/backtest/static_data/{bt_starting_time}_{interval}_ohlc.csv"
     ts_path = f"strategy_stoploss/backtest/static_data/{cfg['backtest']['ts_table_name']}"
-    try:
-        ohlc_df = pd.read_csv(f"{ohlc_path}")
-    except FileNotFoundError:
-        # If not create an OHLC table based on the ts table provided and save it so that it is not needed to be created again
-        ohlc_df = create_ohlc_df(interval=int(interval), path=ts_path)
-        ohlc_df = clean_nan_values(ohlc_df)
-        save_ohlc_data(ohlc_df=ohlc_df, interval=interval)
-        ohlc_df = pd.read_csv(f"{ohlc_path}")
+    ohlc_df = get_ohlc_from_file(ohlc_path=ohlc_path, ts_path=ts_path, interval=interval)
 
+    # reduce the OHLC to the limited values
     number_of_values = int(cfg["backtest"]["ohlc_values_per_response_on_kraken"])
-    json_response = get_ohlc_as_json(ohlc_df=ohlc_df, pair=pair, start=backtest_time, number_of_values=number_of_values)
+    json_response = get_limited_ohlc_at_time(ohlc_df=ohlc_df, pair=pair, start=backtest_time, number_of_values=number_of_values)
 
     return json_response
 
 
-def get_ohlc_as_json(ohlc_df, pair, start, number_of_values=720):
+def get_ohlc_from_file(ohlc_path, ts_path, interval):
+    # Opens an existing OHLC in case it exists.
+    # If not create an OHLC table based on the ts table provided and save it so that it is not needed to be created again
+    try:
+        ohlc_df = pd.read_csv(f"{ohlc_path}")
+    except FileNotFoundError:
+        ohlc_df = create_ohlc_df(interval=int(interval), path=ts_path)
+        ohlc_df = clean_nan_values(ohlc_df)
+        save_ohlc_data(ohlc_df=ohlc_df, interval=interval)
+        ohlc_df = pd.read_csv(f"{ohlc_path}")
+    return ohlc_df
+
+
+def get_limited_ohlc_at_time(ohlc_df, pair, start, number_of_values=720):
     # Create the kraken response dict
     """General Structure of the Kraken OHLC:
     {
@@ -104,13 +108,13 @@ def get_ohlc_as_json(ohlc_df, pair, start, number_of_values=720):
         }
     }
 
-    # Add vmap column with 0 value. As I did not collected this in the dataframe.
+    # Add vmap column with 0 value. As I did not collect this in the dataframe.
     limited_ohlc["Vmap"] = 0
 
-    # reorganize the columns
+    # Reorganize the columns
     new_cols = ["Date", "Open", "High", "Low", "Close", "Volume", "Vmap", "Trades"]
     limited_ohlc = limited_ohlc.reindex(columns=new_cols)
-    # make dataframe to list but keep the dtypes (tolist made everything to float)
+    # Make dataframe to list but keep the dtypes (tolist made everything to float)
     value_list = list(map(list, limited_ohlc.itertuples(index=False)))
     response_dict["result"][pair] = value_list
     response_dict["result"]["last"] = str(limited_ohlc["Date"].iloc[-1])
@@ -239,11 +243,94 @@ def open_ts_table(path):
 
 def get_ticker(pair):
     # Gets the latest ticket
-    json_response = {}
-    return json_response
+    """ General Structure
+    {'XETHZEUR':
+        {
+            'a': ['1606.66000', '3', '3.000'],          Ask [<price>, <whole lot volume>, <lot volume>]
+            'b': ['1606.37000', '1', '1.000'],          Bid [<price>, <whole lot volume>, <lot volume>]
+            'c': ['1606.66000', '0.00061321'],          Last trade closed [<price>, <lot volume>]
+            'v': ['3450.71273470', '8677.89702142'],    Volume [<today>, <last 24 hours>]
+            'p': ['1605.45723', '1593.94790'],          Volume weighted average price [<today>, <last 24 hours>]
+            't': [8469, 28773],                         Number of trades [<today>, <last 24 hours>]
+            'l': ['1586.56000', '1565.16000'],          Low [<today>, <last 24 hours>]
+            'h': ['1624.29000', '1638.33000'],          High [<today>, <last 24 hours>]
+            'o': '1591.22000'                           Today's opening price
+        }
+    }
+    """
+    # The Backtest will just mock the closing price for now. All other values will be set to 0
+    # First create the basic template for the response dict
+    response_dict = {
+        pair:
+            {'a': ['0.00', '0', '0.00'],
+             'b': ['0.00', '0', '0.00'],
+             'c': ['0.00', '0.00'],
+             'v': ['0.00', '0.00'],
+             'p': ['0.00', '0.00'],
+             't': [0.00, 0.00],
+             'l': ['0.00', '0.00'],
+             'h': ['0.00', '0.00'],
+             'o': '0.00'
+             }
+    }
+    backtest_time = get_current_backtest_time_unix()
+
+    # Open ts-table
+    ts_path = f"strategy_stoploss/backtest/static_data/{cfg['backtest']['ts_table_name']}"
+    ts_df = open_ts_table(ts_path)
+
+    # Select the closing price equal or earlier than backtest_time
+    trades_earlier_than_backtest_time = ts_df.loc[(ts_df["Unix_Date"] <= backtest_time)]
+    # It is possible that the ts-table does not contain a value which is below the backtest_time.
+    # In this case it will use the first value of the ts-table as price
+    if len(trades_earlier_than_backtest_time) == 0:
+        trades_earlier_than_backtest_time = ts_df.iloc[0]
+    # It is possible that just one trade is selected. In this case iloc can not be used.
+    try:
+        last_trade_closed_price = trades_earlier_than_backtest_time["Price"].iloc[-1]
+    except AttributeError:
+        last_trade_closed_price = trades_earlier_than_backtest_time["Price"]
+
+    response_dict[pair]["c"] = [str(last_trade_closed_price), '0.00']
+
+    # I am dumping it once into json to ensure that the structure is correct
+    json_response = json.dumps(response_dict)
+    # Then load it again, so that it is not a string but a dict.
+    return json.loads(json_response)
 
 
 def get_asset_pairs(pair):
     # Gets Kraken asset Pairs
-    json_response = {}
-    return json_response
+    response_dict = {
+        'error': [],
+        'result': {
+            'XETHZEUR': {
+                'altname': 'ETHEUR',
+                'wsname': 'ETH/EUR',
+                'aclass_base':
+                'currency',
+                'base': 'XETH',
+                'aclass_quote': 'currency',
+                'quote': 'ZEUR',
+                'lot': 'unit',
+                'cost_decimals': 5,
+                'pair_decimals': 2,
+                'lot_decimals': 8,
+                'lot_multiplier': 1,
+                'leverage_buy': [2, 3, 4, 5],
+                'leverage_sell': [2, 3, 4, 5],
+                'fees': [[0, 0.26], [50000, 0.24], [100000, 0.22], [250000, 0.2], [500000, 0.18], [1000000, 0.16], [2500000, 0.14], [5000000, 0.12], [10000000, 0.1]],
+                'fees_maker': [[0, 0.16], [50000, 0.14], [100000, 0.12], [250000, 0.1], [500000, 0.08], [1000000, 0.06], [2500000, 0.04], [5000000, 0.02], [10000000, 0.0]],
+                'fee_volume_currency': 'ZUSD',
+                'margin_call': 80,
+                'margin_stop': 40,
+                'ordermin': '0.01',
+                'costmin': '0.45',
+                'tick_size': '0.01'
+                }
+            }
+        }
+    # I am dumping it once into json to ensure that the structure is correct
+    json_response = json.dumps(response_dict)
+    # Then load it again, so that it is not a string but a dict.
+    return json.loads(json_response)

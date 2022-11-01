@@ -270,7 +270,7 @@ if __name__ == "__main__":
         while time_till_finish >= time.time():
             if backtest == 1:
                 with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'rb') as f:
-                    backtest_time = pickle.load(f)
+                    backtest_time = get_backtest_start_time_unix()
                 current_time = convert_unix_time_to_datetime(int(backtest_time))
             else:
                 current_time = convert_unix_time_to_datetime(time.time())

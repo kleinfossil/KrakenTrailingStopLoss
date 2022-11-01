@@ -236,7 +236,7 @@ class TestBacktest(unittest.TestCase):
         ohlc_df = transform_ohlc_json_to_ohlc_dataframe(json_data=response, api_symbol="XETHZEUR")
         first_date = ohlc_df["Date"].iloc[0]
         last_date = ohlc_df["Date"].iloc[-1]
-        lenght =  len(ohlc_df)
+        lenght = len(ohlc_df)
 
         set_backtest_forward()
         response = get_ohlc_json(pair="XETHZEUR", interval=1)
@@ -252,6 +252,23 @@ class TestBacktest(unittest.TestCase):
         # self.assertEqual(ohlc_df["Date"].loc[moved].index(), ohlc_df["Date"].loc[first_date_two].index(), "Date not moved correctly")
         self.assertEqual(lenght_two, lenght, "both ohlc have not the same lenght")
         self.assertEqual(lenght_two, int(backtest_cfg["backtest"]["ohlc_values_per_response_on_kraken"]))
+
+    def test_get_Ticker(self):
+        from strategy_stoploss.backtest.connect_kraken_public import get_ticker
+        set_backtest_starting_time(backtest_status=1)
+        response = get_ticker("XETHZEUR")
+        self.assertTrue(not response["XETHZEUR"]["c"][0] == "", "Return Value should be not empty")
+        self.assertTrue(float(response["XETHZEUR"]["c"][0]) > 0.00, f"It is expected that the last closing price is larger 0.00. Value was: {response['XETHZEUR']['c'][0]}")
+        set_backtest_forward()
+        response = get_ticker("XETHZEUR")
+        self.assertTrue(not response["XETHZEUR"]["c"][0] == "", "Return Value should be not empty")
+        self.assertTrue(float(response["XETHZEUR"]["c"][0]) > 0.00, f"It is expected that the last closing price is larger 0.00. Value was: {response['XETHZEUR']['c'][0]}")
+
+    def test_get_asset_pair(self):
+        from strategy_stoploss.connect_kraken_public import get_asset_pairs
+        response = get_asset_pairs(pair="XETHZEUR")
+        self.assertTrue(not response["XETHZEUR"]["c"][0] == "", "Return Value should be not empty")
+
 
     @classmethod
     def tearDownClass(cls):
