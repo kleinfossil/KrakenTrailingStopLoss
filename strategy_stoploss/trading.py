@@ -80,7 +80,7 @@ def format_trading_message(message_type, position, trade_message="Trade", trade_
     # Output show on the screen during trading
 
     if message_type == "intro":
-        earnings_dict = get_fee_adjusted_price_and_earnings(buy_sell_type, volume, price)
+
 
         print(f"---------------> {trade_message} ------------->")
         print(f"Trade Reason: {trade_reason_message}")
@@ -92,16 +92,22 @@ def format_trading_message(message_type, position, trade_message="Trade", trade_
               f"    Trigger: {price} - Limit Price: {price2}\n"
               f"    Order Value: {volume * price}")
         print("")
-        fee_adjusted_last_price = earnings_dict["fee_adj_price"]
 
-        fee_adjusted_last_price = Decimal(fee_adjusted_last_price).quantize(Decimal('0.01'))
-        earnings = Decimal(earnings_dict["earnings"]).quantize(Decimal('0.01'))
-        last_price = Decimal(earnings_dict["last_price"]).quantize(Decimal('0.01'))
+        backtest = cfg["basic"]["backtest_active"]
+        if backtest == 0:
+            earnings_dict = get_fee_adjusted_price_and_earnings(buy_sell_type, volume, price)
+            fee_adjusted_last_price = earnings_dict["fee_adj_price"]
 
-        if earnings > 0:
-            print(f"Last Trade: {earnings_dict['last_type']} {last_price} / fee adj.: {fee_adjusted_last_price}. Trigger: {buy_sell_type} {price} -{coloring.OKGREEN} Win: {earnings} {coloring.ENDC}")
-        else:
-            print(f"Last Trade: {earnings_dict['last_type']} {last_price} / fee adj.: {fee_adjusted_last_price}. Trigger: {buy_sell_type} {price} -{coloring.WARNING} Lose: {earnings} {coloring.ENDC}")
+            fee_adjusted_last_price = Decimal(fee_adjusted_last_price).quantize(Decimal('0.01'))
+            earnings = Decimal(earnings_dict["earnings"]).quantize(Decimal('0.01'))
+            last_price = Decimal(earnings_dict["last_price"]).quantize(Decimal('0.01'))
+
+            if earnings > 0:
+                print(f"Last Trade: {earnings_dict['last_type']} {last_price} / fee adj.: {fee_adjusted_last_price}. Trigger: {buy_sell_type} {price} -{coloring.OKGREEN} Win: {earnings} {coloring.ENDC}")
+            else:
+                print(f"Last Trade: {earnings_dict['last_type']} {last_price} / fee adj.: {fee_adjusted_last_price}. Trigger: {buy_sell_type} {price} -{coloring.WARNING} Lose: {earnings} {coloring.ENDC}")
+        elif backtest == 1:
+            print("Backtest Active - No Earnings calculated")
 
     elif message_type == "outro":
         if resp != "":

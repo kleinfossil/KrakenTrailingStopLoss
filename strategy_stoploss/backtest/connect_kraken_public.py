@@ -18,7 +18,6 @@ with open("strategy_stoploss/backtest/backtest_config.yml", "r") as yml_file:
 logger = get_logger("backtest_logger")
 
 
-
 def get_ohlc_json(pair, interval=1, since=0):
     # Provides Open, High, Low, Close Data. See: https://docs.kraken.com/rest/#operation/getOHLCData
 
@@ -96,8 +95,18 @@ def get_limited_ohlc_at_time(ohlc_df, pair, start, number_of_values=720):
     # select just the values needed
     start = int(start)
     number_of_values = int(number_of_values)
-    limited_ohlc = ohlc_df.loc[ohlc_df["Date"] >= start]
-    limited_ohlc = limited_ohlc.iloc[0:number_of_values]
+    limited_ohlc = ohlc_df.loc[ohlc_df["Date"] <= start]
+    try:
+        length = len(limited_ohlc)
+        if length > number_of_values:
+            start_index = length - number_of_values
+            limited_ohlc = limited_ohlc.iloc[start_index:-1]
+        else:
+            limited_ohlc = limited_ohlc.iloc[0:length]
+    # It is possible that the limit_ohlc has just one or no value (because start is < the first values of the ohlc). In this case iloc will not work.
+    # In this edge case the program will just return the last two values
+    except AttributeError:
+        limited_ohlc = ohlc_df.iloc[0:2]
 
     # First create the basic template for the response dict
     response_dict = {

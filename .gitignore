@@ -1,7 +1,7 @@
 /books/*
 /logs/*
 /strategy_stoploss/backtest/static_data/*
-/strategy_stoploss/backtest//runtime_data/*
+/strategy_stoploss/backtest/runtime_data/*
 /key_files/api_key_development.yml
 /key_files/mail_info.yml
 __pycache__

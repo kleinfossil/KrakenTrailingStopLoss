@@ -8,6 +8,7 @@ from decimal import Decimal
 import yaml
 from yaml.loader import SafeLoader
 
+
 with open("trader_config.yml", "r") as yml_file:
     cfg = yaml.load(yml_file, Loader=SafeLoader)
 
@@ -105,7 +106,7 @@ def set_new_trigger(position, std, std_before, high, low, last_trade_price):
     return position
 
 
-def calculate_stop_loss_trigger(position, order=None, std_interval="d", std_history=10, minmax_interval="h", minmax_history=24):
+def calculate_stop_loss_trigger(position, std_interval, std_history, minmax_interval, minmax_history, order=None,):
     # Main Function to manage the stop los trigger and implement the trailing stop strategy
 
     # Possible Situations

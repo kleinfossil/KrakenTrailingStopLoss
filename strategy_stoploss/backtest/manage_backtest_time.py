@@ -51,6 +51,17 @@ def set_backtest_forward():
     try:
         with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'wb') as f:
             pickle.dump(new_backtest_time, f)
+            return new_backtest_time
+    except FileNotFoundError as e:
+        logger.error(traceback, e)
+        exit(1)
+
+
+def set_backtest_time(backtest_time):
+    new_backtest_time = backtest_time
+    try:
+        with open('strategy_stoploss/backtest/runtime_data/backtest_current_time.pickle', 'wb') as f:
+            pickle.dump(new_backtest_time, f)
     except FileNotFoundError as e:
         logger.error(traceback, e)
         exit(1)
